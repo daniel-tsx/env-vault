@@ -1,36 +1,205 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EnvVault
+
+A secure environment variable manager for developers who work on multiple projects.
+
+## Features
+
+- **Multi-project support**: Organize variables across all your projects
+- **AES-256-GCM encryption**: All secrets are encrypted at rest
+- **Environment groups**: Separate development, staging, and production variables
+- **Secure by default**: Values are masked in the UI, revealed only on demand
+- **Fast search**: Find any variable instantly
+- **One-click copy**: Copy values securely after reveal
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- TypeScript
+- Tailwind CSS
+- Drizzle ORM
+- Neon Postgres
+- BetterAuth
+- Zod
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+
+- pnpm (recommended) or npm
+- A Neon Postgres database (free tier available at [neon.tech](https://neon.tech))
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd env-vault
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+pnpm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Create a `.env.local` file based on `.env.example`:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+4. Configure your environment variables:
 
-## Learn More
+```env
+# Database - Get from neon.tech
+DATABASE_URL=postgresql://...
 
-To learn more about Next.js, take a look at the following resources:
+# Generate with: openssl rand -hex 32
+BETTER_AUTH_SECRET=your-secret-here
+BETTER_AUTH_URL=http://localhost:3000
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Generate with: openssl rand -hex 32
+ENCRYPTION_KEY=your-encryption-key-here
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Generating secure keys:**
 
-## Deploy on Vercel
+```bash
+# On macOS/Linux
+openssl rand -hex 32
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# On Windows (PowerShell)
+-join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Or use an online generator (use at your own risk)
+```
+
+5. Push the database schema:
+```bash
+pnpm db:push
+```
+
+6. Run the development server:
+```bash
+pnpm dev
+```
+
+7. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Project Structure
+
+```
+env-vault/
+├── app/                          # Next.js App Router pages
+│   ├── (auth)/                   # Auth pages (sign-in, sign-up)
+│   ├── (dashboard)/              # Protected dashboard pages
+│   │   └── projects/
+│   ├── api/auth/                 # BetterAuth API routes
+│   └── layout.tsx
+├── components/                   # Shared UI components
+├── db/
+│   ├── schema.ts                 # Drizzle schema definitions
+│   └── index.ts                  # Database client
+├── features/
+│   ├── projects/                 # Project-related actions & components
+│   ├── environments/             # Environment-related actions & components
+│   └── variables/                # Variable-related actions & components
+├── lib/
+│   ├── auth/                     # BetterAuth configuration
+│   ├── crypto/                   # Encryption/decryption utilities
+│   ├── validators/               # Zod validation schemas
+│   └── utils.ts                  # Utility functions
+└── middleware.ts                 # Route protection middleware
+```
+
+## Security
+
+### Encryption
+
+All environment variable values are encrypted using **AES-256-GCM** before being stored in the database:
+
+- **Algorithm**: AES-256-GCM (authenticated encryption)
+- **Key**: 32-byte key from `ENCRYPTION_KEY` environment variable
+- **IV**: Random 12-byte initialization vector per value
+- **Auth Tag**: 16-byte authentication tag for integrity verification
+- **Storage format**: `iv:authTag:ciphertext` (all hex-encoded)
+
+### Secret Reveal Flow
+
+1. User clicks "Reveal" button
+2. Server action verifies session and ownership
+3. Value is decrypted server-side
+4. Decrypted value is sent to client
+5. Value is displayed temporarily and can be hidden again
+
+### Ownership Enforcement
+
+Every server action and query follows this pattern:
+1. Verify user session
+2. Load resource
+3. Verify resource belongs to user
+4. Proceed with operation
+
+This ensures users can only access their own projects, environments, and variables.
+
+## Database Commands
+
+```bash
+# Generate migrations (not used with db:push, but available)
+pnpm db:generate
+
+# Push schema changes to database
+pnpm db:push
+
+# Open Drizzle Studio (database GUI)
+pnpm db:studio
+```
+
+## Deployment
+
+### Environment Variables
+
+Make sure to set all required environment variables in your deployment platform:
+
+- `DATABASE_URL`
+- `BETTER_AUTH_SECRET`
+- `BETTER_AUTH_URL` (your production URL)
+- `ENCRYPTION_KEY`
+
+### Vercel
+
+1. Push your code to GitHub
+2. Import project in Vercel
+3. Add environment variables in Vercel dashboard
+4. Deploy
+
+### Other Platforms
+
+Follow your platform's deployment guide for Next.js apps. Ensure all environment variables are configured.
+
+## Security Best Practices
+
+1. **Never commit `.env.local`** - it's already in `.gitignore`
+2. **Use strong, unique keys** for `BETTER_AUTH_SECRET` and `ENCRYPTION_KEY`
+3. **Rotate encryption keys** periodically (requires re-encrypting all values)
+4. **Use HTTPS in production** - set `BETTER_AUTH_URL` to your HTTPS URL
+5. **Review access logs** - monitor for unauthorized access attempts
+6. **Backup your database** - encrypted data is only as safe as your backups
+
+## Future Enhancements
+
+- [ ] Team/workspace support
+- [ ] Variable sharing between team members
+- [ ] Audit logs for all actions
+- [ ] Bulk import/export (encrypted)
+- [ ] CLI tool for syncing variables
+- [ ] API access with scoped tokens
+- [ ] Variable versioning/history
+- [ ] Integration with CI/CD platforms
+
+## License
+
+MIT
+
+## Contributing
+
+Contributions are welcome! Please open an issue or submit a pull request.
