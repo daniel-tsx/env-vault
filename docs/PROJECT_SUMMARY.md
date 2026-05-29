@@ -75,7 +75,7 @@ env-vault/
 ├── .env.example                       # Environment variables template
 ├── .env.local                         # Local environment (gitignored)
 ├── README.md                          # Full documentation
-└── QUICKSTART.md                      # Quick start guide
+└── docs/QUICKSTART.md                 # Quick start guide
 ```
 
 ## Database Schema
@@ -327,7 +327,7 @@ pnpm dev
 
 For issues or questions:
 - Check README.md for detailed documentation
-- Check QUICKSTART.md for setup instructions
+- Check docs/QUICKSTART.md for setup instructions
 - Review security section for best practices
 - Open an issue on GitHub
 
