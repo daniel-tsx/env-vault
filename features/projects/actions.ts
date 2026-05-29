@@ -19,13 +19,14 @@ export async function getProjects(search?: string) {
     .orderBy(projects.createdAt);
 
   if (search) {
+    const escapedSearch = search.replace(/[%_]/g, "\\$&");
     query = db
       .select()
       .from(projects)
       .where(
         and(
           eq(projects.userId, session.user.id),
-          like(projects.name, `%${search}%`)
+          like(projects.name, `%${escapedSearch}%`)
         )
       )
       .orderBy(projects.createdAt);

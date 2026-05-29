@@ -69,9 +69,13 @@ function VariableItem({ variable }: { variable: Variable }) {
       const result = await revealVariable(variable.id);
       setValue(result.value);
       setRevealed(true);
-    } catch (err) {
+      
+      setTimeout(() => {
+        setRevealed(false);
+        setValue(null);
+      }, 30000);
+    } catch {
       toast.error("Failed to reveal variable");
-      console.error("Failed to reveal variable:", err);
     } finally {
       setLoading(false);
     }
@@ -88,9 +92,13 @@ function VariableItem({ variable }: { variable: Variable }) {
         setCopied(true);
         toast.success("Copied to clipboard");
         setTimeout(() => setCopied(false), 2000);
-      } catch (err) {
+        
+        setTimeout(() => {
+          setRevealed(false);
+          setValue(null);
+        }, 30000);
+      } catch {
         toast.error("Failed to copy variable");
-        console.error("Failed to copy variable:", err);
       } finally {
         setLoading(false);
       }
@@ -108,9 +116,8 @@ function VariableItem({ variable }: { variable: Variable }) {
       await deleteVariable(variable.id);
       toast.success("Variable deleted");
       router.refresh();
-    } catch (err) {
+    } catch {
       toast.error("Failed to delete variable");
-      console.error("Failed to delete variable:", err);
       setDeleting(false);
     }
   }

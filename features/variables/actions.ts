@@ -80,6 +80,7 @@ export async function getVariables(environmentId: string, search?: string) {
     .orderBy(environmentVariables.key);
 
   if (search) {
+    const escapedSearch = search.replace(/[%_]/g, "\\$&");
     query = db
       .select({
         id: environmentVariables.id,
@@ -92,7 +93,7 @@ export async function getVariables(environmentId: string, search?: string) {
       .where(
         and(
           eq(environmentVariables.environmentId, environmentId),
-          like(environmentVariables.key, `%${search}%`)
+          like(environmentVariables.key, `%${escapedSearch}%`)
         )
       )
       .orderBy(environmentVariables.key);

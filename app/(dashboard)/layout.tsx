@@ -12,6 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { signOut } from "@/features/auth/actions";
 
 export default async function DashboardLayout({
   children,
@@ -68,12 +69,14 @@ export default async function DashboardLayout({
                 }}
                 className="w-full"
               >
-                <DropdownMenuItem>
+              <DropdownMenuItem>
+                <form action={signOut} className="w-full">
                   <button type="submit" className="w-full flex items-center">
-                    <LogOut className="size-4" data-icon="inline-start" />
+                    <LogOut className="size-4" />
                     Sign out
                   </button>
-                </DropdownMenuItem>
+                </form>
+              </DropdownMenuItem>
               </form>
             </DropdownMenuContent>
           </DropdownMenu>
