@@ -4,6 +4,11 @@ import { useState } from "react";
 import { createVariable } from "@/features/variables/actions";
 import { Plus, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 export function AddVariableForm({ environmentId }: { environmentId: string }) {
   const router = useRouter();
@@ -30,6 +35,7 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
       setValue("");
       setDescription("");
       setOpen(false);
+      toast.success("Variable created");
       router.refresh();
     } catch (err) {
       setError(
@@ -42,91 +48,88 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
 
   if (!open) {
     return (
-      <button
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={() => setOpen(true)}
-        className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
+        className="text-muted-foreground"
       >
-        <Plus className="w-4 h-4" />
+        <Plus className="size-4" data-icon="inline-start" />
         Add variable
-      </button>
+      </Button>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3 border border-border rounded-md p-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-3 border border-border rounded-md p-4"
+    >
       <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label
-            htmlFor="var-key"
-            className="block text-xs font-medium mb-1"
-          >
+        <div className="space-y-2">
+          <Label htmlFor="var-key" className="text-xs">
             Key
-          </label>
-          <input
+          </Label>
+          <Input
             id="var-key"
             type="text"
             required
             value={key}
             onChange={(e) => setKey(e.target.value.toUpperCase())}
-            className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+            className="font-mono text-sm"
             placeholder="API_KEY"
           />
         </div>
 
-        <div>
-          <label
-            htmlFor="var-value"
-            className="block text-xs font-medium mb-1"
-          >
+        <div className="space-y-2">
+          <Label htmlFor="var-value" className="text-xs">
             Value
-          </label>
-          <input
+          </Label>
+          <Input
             id="var-value"
             type="text"
             required
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+            className="font-mono text-sm"
             placeholder="secret-value"
           />
         </div>
       </div>
 
-      <div>
-        <label
-          htmlFor="var-description"
-          className="block text-xs font-medium mb-1"
-        >
+      <div className="space-y-2">
+        <Label htmlFor="var-description" className="text-xs">
           Description (optional)
-        </label>
-        <input
+        </Label>
+        <Input
           id="var-description"
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-3 py-2 rounded-md border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          className="text-sm"
           placeholder="What is this variable for?"
         />
       </div>
 
-      {error && <p className="text-sm text-destructive">{error}</p>}
+      {error && (
+        <Alert variant="destructive">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
       <div className="flex gap-2 justify-end">
-        <button
+        <Button
           type="button"
+          variant="outline"
+          size="sm"
           onClick={() => setOpen(false)}
-          className="px-3 py-1.5 rounded-md border border-border hover:bg-accent transition-colors text-sm"
         >
           Cancel
-        </button>
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-primary text-primary-foreground px-3 py-1.5 rounded-md font-medium hover:opacity-90 transition-opacity disabled:opacity-50 flex items-center gap-2 text-sm"
-        >
-          {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+        </Button>
+        <Button type="submit" size="sm" disabled={loading}>
+          {loading && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
           Add
-        </button>
+        </Button>
       </div>
     </form>
   );

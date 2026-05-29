@@ -6,6 +6,20 @@ import { VariableList } from "@/features/variables/variable-list";
 import { AddVariableForm } from "@/features/variables/add-variable-form";
 import { Trash2, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { InferSelectModel } from "drizzle-orm";
 import type { environments, environmentVariables } from "@/db/schema";
 
@@ -27,7 +41,6 @@ export function EnvironmentSection({
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false);
 
   async function handleDelete() {
     setDeleting(true);
@@ -40,61 +53,66 @@ export function EnvironmentSection({
   }
 
   return (
-    <div className="border border-border rounded-lg">
-      <div className="flex items-center justify-between p-4 border-b border-border">
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex items-center gap-2 font-medium hover:text-foreground transition-colors"
-        >
-          {collapsed ? (
-            <ChevronRight className="w-4 h-4" />
-          ) : (
-            <ChevronDown className="w-4 h-4" />
-          )}
-          {environment.name}
-          <span className="text-sm text-muted-foreground font-normal">
-            ({variables.length} variable{variables.length !== 1 ? "s" : ""})
-          </span>
-        </button>
-        <div className="flex items-center gap-2">
-          {confirmDelete ? (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">
-                Delete this environment?
-              </span>
-              <button
-                onClick={handleDelete}
-                disabled={deleting}
-                className="text-sm bg-destructive text-white px-3 py-1 rounded hover:opacity-90 disabled:opacity-50 flex items-center gap-1"
-              >
-                {deleting && <Loader2 className="w-3 h-3 animate-spin" />}
-                Yes
-              </button>
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="text-sm px-3 py-1 rounded border border-border hover:bg-accent"
-              >
-                No
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setConfirmDelete(true)}
-              className="text-muted-foreground hover:text-destructive transition-colors p-1"
-              title="Delete environment"
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex items-center gap-2 font-medium hover:text-foreground transition-colors"
+          >
+            {collapsed ? (
+              <ChevronRight className="size-4" />
+            ) : (
+              <ChevronDown className="size-4" />
+            )}
+            {environment.name}
+            <Badge variant="secondary">
+              {variables.length} variable{variables.length !== 1 ? "s" : ""}
+            </Badge>
+          </button>
+          <AlertDialog>
+            <AlertDialogTrigger
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-destructive"
+                />
+              }
             >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          )}
+              <Trash2 className="size-4" />
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete environment</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete the{" "}
+                  <strong>{environment.name}</strong> environment and all its
+                  variables. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
-      </div>
+      </CardHeader>
 
       {!collapsed && (
-        <div className="p-4">
+        <CardContent className="pt-0">
           <VariableList variables={variables} />
           <AddVariableForm environmentId={environment.id} />
-        </div>
+        </CardContent>
       )}
-    </div>
+    </Card>
   );
 }

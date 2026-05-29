@@ -4,8 +4,11 @@ import { getVariables } from "@/features/variables/actions";
 import { CreateEnvironmentDialog } from "@/features/environments/create-environment-dialog";
 import { EnvironmentSection } from "@/features/environments/environment-section";
 import { DeleteProjectButton } from "@/features/projects/delete-project-button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Folder } from "lucide-react";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default async function ProjectDetailPage({
   params,
@@ -25,23 +28,25 @@ export default async function ProjectDetailPage({
 
   return (
     <div>
-      <Link
-        href="/projects"
-        className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
-      >
-        <ArrowLeft className="w-4 h-4" />
+      <Button variant="ghost" size="sm" render={<Link href="/projects" />} className="mb-6">
+        <ArrowLeft className="size-4" data-icon="inline-start" />
         Back to projects
-      </Link>
+      </Button>
 
       <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">{project.name}</h1>
+          <div className="flex items-center gap-3 mb-2">
+            <Folder className="size-8 text-primary" />
+            <h1 className="text-2xl font-bold">{project.name}</h1>
+          </div>
           {project.description && (
-            <p className="text-muted-foreground mt-1">{project.description}</p>
+            <p className="text-muted-foreground">{project.description}</p>
           )}
         </div>
         <DeleteProjectButton projectId={project.id} projectName={project.name} />
       </div>
+
+      <Separator className="mb-6" />
 
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-semibold">Environments</h2>
@@ -49,12 +54,15 @@ export default async function ProjectDetailPage({
       </div>
 
       {variablesByEnvironment.length === 0 ? (
-        <div className="text-center py-16 border border-dashed border-border rounded-lg">
-          <h3 className="text-lg font-medium mb-2">No environments yet</h3>
-          <p className="text-muted-foreground">
-            Create your first environment to start adding variables.
-          </p>
-        </div>
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-16">
+            <Folder className="size-12 mb-4 text-muted-foreground" />
+            <h3 className="text-lg font-medium mb-2">No environments yet</h3>
+            <p className="text-muted-foreground text-center">
+              Create your first environment to start adding variables.
+            </p>
+          </CardContent>
+        </Card>
       ) : (
         <div className="space-y-8">
           {variablesByEnvironment.map(({ environment, variables }) => (
