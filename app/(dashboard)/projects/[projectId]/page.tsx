@@ -6,7 +6,6 @@ import { EnvironmentSection } from "@/features/environments/environment-section"
 import { DeleteProjectButton } from "@/features/projects/delete-project-button";
 import { ArrowLeft, Folder } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
@@ -28,10 +27,13 @@ export default async function ProjectDetailPage({
 
   return (
     <div>
-      <Button variant="ghost" size="sm" render={<Link href="/projects" />} className="mb-6">
+      <Link 
+        href="/projects"
+        className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2 mb-6"
+      >
         <ArrowLeft className="size-4 mr-2" />
         Back to projects
-      </Button>
+      </Link>
 
       <div className="flex items-start justify-between mb-8">
         <div className="flex items-start gap-4">

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Lock, FolderKey, Search, Copy, Shield, Zap, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function LandingPage() {
@@ -17,12 +16,18 @@ export default function LandingPage() {
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </div>
           <nav className="flex items-center gap-3">
-            <Button variant="ghost" size="sm" render={<Link href="/sign-in" />}>
+            <Link 
+              href="/sign-in"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
+            >
               Sign in
-            </Button>
-            <Button size="sm" render={<Link href="/sign-up" />}>
+            </Link>
+            <Link 
+              href="/sign-up"
+              className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-9 px-4 py-2"
+            >
               Get started
-            </Button>
+            </Link>
           </nav>
         </div>
       </header>
@@ -49,13 +54,19 @@ export default function LandingPage() {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <Button size="lg" className="text-base px-8 h-12" render={<Link href="/sign-up" />}>
+              <Link 
+                href="/sign-up"
+                className="inline-flex items-center justify-center rounded-md text-base font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8"
+              >
                 Start for free
                 <ArrowRight className="size-4 ml-2" />
-              </Button>
-              <Button size="lg" variant="outline" className="text-base px-8 h-12" render={<Link href="/sign-in" />}>
+              </Link>
+              <Link 
+                href="/sign-in"
+                className="inline-flex items-center justify-center rounded-md text-base font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-12 px-8"
+              >
                 Sign in
-              </Button>
+              </Link>
             </div>
           </div>
         </section>
@@ -115,10 +126,13 @@ export default function LandingPage() {
               <p className="text-lg text-muted-foreground mb-8">
                 Join developers who trust EnvVault with their most sensitive configuration.
               </p>
-              <Button size="lg" className="text-base px-8 h-12" render={<Link href="/sign-up" />}>
+              <Link 
+                href="/sign-up"
+                className="inline-flex items-center justify-center rounded-md text-base font-medium transition-colors bg-primary text-primary-foreground hover:bg-primary/90 h-12 px-8"
+              >
                 Get started for free
                 <ArrowRight className="size-4 ml-2" />
-              </Button>
+              </Link>
             </div>
           </div>
         </section>
