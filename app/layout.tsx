@@ -20,6 +20,10 @@ export const metadata: Metadata = {
   title: "EnvVault - Secure Environment Variable Manager",
   description:
     "Manage environment variables across all your projects. Secure, encrypted, and built for developers.",
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/logo.png",
+  },
 };
 
 export default function RootLayout({
