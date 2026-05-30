@@ -64,9 +64,9 @@ export function DeleteProjectButton({
       >
         <Trash2 className="size-5" />
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="sm:max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete project</AlertDialogTitle>
+          <AlertDialogTitle className="text-2xl">Delete project</AlertDialogTitle>
           <AlertDialogDescription>
             This will permanently delete <strong>{projectName}</strong> and all
             its environments and variables. This action cannot be undone.
@@ -74,13 +74,14 @@ export function DeleteProjectButton({
         </AlertDialogHeader>
         <div className="space-y-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="confirm-name">
+            <Label htmlFor="confirm-name" className="text-sm font-medium">
               Type <strong>{projectName}</strong> to confirm
             </Label>
             <Input
               id="confirm-name"
               value={confirmName}
               onChange={(e) => setConfirmName(e.target.value)}
+              className="h-11"
             />
           </div>
 
@@ -104,8 +105,8 @@ export function DeleteProjectButton({
             disabled={loading || confirmName !== projectName}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
-            Delete
+            {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            Delete project
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

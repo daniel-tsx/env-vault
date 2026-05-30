@@ -49,12 +49,12 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
   if (!open) {
     return (
       <Button
-        variant="ghost"
+        variant="outline"
         size="sm"
         onClick={() => setOpen(true)}
-        className="text-muted-foreground"
+        className="w-full"
       >
-        <Plus className="size-4" data-icon="inline-start" />
+        <Plus className="size-4 mr-2" />
         Add variable
       </Button>
     );
@@ -63,11 +63,11 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-3 border border-border rounded-md p-4"
+      className="space-y-4 border border-border/50 rounded-lg p-5 bg-muted/20"
     >
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="var-key" className="text-xs">
+          <Label htmlFor="var-key" className="text-sm font-medium">
             Key
           </Label>
           <Input
@@ -76,13 +76,13 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
             required
             value={key}
             onChange={(e) => setKey(e.target.value.toUpperCase())}
-            className="font-mono text-sm"
+            className="font-mono"
             placeholder="API_KEY"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="var-value" className="text-xs">
+          <Label htmlFor="var-value" className="text-sm font-medium">
             Value
           </Label>
           <Input
@@ -91,14 +91,14 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
             required
             value={value}
             onChange={(e) => setValue(e.target.value)}
-            className="font-mono text-sm"
+            className="font-mono"
             placeholder="secret-value"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="var-description" className="text-xs">
+        <Label htmlFor="var-description" className="text-sm font-medium">
           Description (optional)
         </Label>
         <Input
@@ -106,7 +106,6 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="text-sm"
           placeholder="What is this variable for?"
         />
       </div>
@@ -117,18 +116,18 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
         </Alert>
       )}
 
-      <div className="flex gap-2 justify-end">
+      <div className="flex gap-3 justify-end">
         <Button
           type="button"
-          variant="outline"
+          variant="ghost"
           size="sm"
           onClick={() => setOpen(false)}
         >
           Cancel
         </Button>
         <Button type="submit" size="sm" disabled={loading}>
-          {loading && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
-          Add
+          {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+          Add variable
         </Button>
       </div>
     </form>

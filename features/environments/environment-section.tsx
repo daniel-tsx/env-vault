@@ -4,7 +4,7 @@ import { useState } from "react";
 import { deleteEnvironment } from "@/features/environments/actions";
 import { VariableList } from "@/features/variables/variable-list";
 import { AddVariableForm } from "@/features/variables/add-variable-form";
-import { Trash2, Loader2, ChevronDown, ChevronRight } from "lucide-react";
+import { Trash2, Loader2, ChevronDown, ChevronRight, Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -53,20 +53,23 @@ export function EnvironmentSection({
   }
 
   return (
-    <Card>
-      <CardHeader className="pb-3">
+    <Card className="overflow-hidden">
+      <CardHeader className="pb-4 bg-muted/30 border-b border-border/50">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setCollapsed(!collapsed)}
-            className="flex items-center gap-2 font-medium hover:text-foreground transition-colors"
+            className="flex items-center gap-3 font-semibold hover:text-primary transition-colors group"
           >
             {collapsed ? (
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-4 text-muted-foreground group-hover:text-primary" />
             ) : (
-              <ChevronDown className="size-4" />
+              <ChevronDown className="size-4 text-muted-foreground group-hover:text-primary" />
             )}
-            {environment.name}
-            <Badge variant="secondary">
+            <div className="size-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Server className="size-4 text-primary" />
+            </div>
+            <span className="text-lg">{environment.name}</span>
+            <Badge variant="secondary" className="ml-2">
               {variables.length} variable{variables.length !== 1 ? "s" : ""}
             </Badge>
           </button>
@@ -98,7 +101,7 @@ export function EnvironmentSection({
                   disabled={deleting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {deleting && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
+                  {deleting && <Loader2 className="size-4 animate-spin mr-2" />}
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>
@@ -108,9 +111,11 @@ export function EnvironmentSection({
       </CardHeader>
 
       {!collapsed && (
-        <CardContent className="pt-0">
+        <CardContent className="pt-6">
           <VariableList variables={variables} />
-          <AddVariableForm environmentId={environment.id} />
+          <div className="mt-6 pt-6 border-t border-border/50">
+            <AddVariableForm environmentId={environment.id} />
+          </div>
         </CardContent>
       )}
     </Card>

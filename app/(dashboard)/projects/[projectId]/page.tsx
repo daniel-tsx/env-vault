@@ -29,42 +29,46 @@ export default async function ProjectDetailPage({
   return (
     <div>
       <Button variant="ghost" size="sm" render={<Link href="/projects" />} className="mb-6">
-        <ArrowLeft className="size-4" data-icon="inline-start" />
+        <ArrowLeft className="size-4 mr-2" />
         Back to projects
       </Button>
 
       <div className="flex items-start justify-between mb-8">
-        <div>
-          <div className="flex items-center gap-3 mb-2">
-            <Folder className="size-8 text-primary" />
-            <h1 className="text-2xl font-bold">{project.name}</h1>
+        <div className="flex items-start gap-4">
+          <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center">
+            <Folder className="size-7 text-primary" />
           </div>
-          {project.description && (
-            <p className="text-muted-foreground">{project.description}</p>
-          )}
+          <div>
+            <h1 className="text-3xl font-bold mb-1">{project.name}</h1>
+            {project.description && (
+              <p className="text-muted-foreground">{project.description}</p>
+            )}
+          </div>
         </div>
         <DeleteProjectButton projectId={project.id} projectName={project.name} />
       </div>
 
-      <Separator className="mb-6" />
+      <Separator className="mb-8" />
 
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold">Environments</h2>
+        <h2 className="text-xl font-semibold">Environments</h2>
         <CreateEnvironmentDialog projectId={projectId} />
       </div>
 
       {variablesByEnvironment.length === 0 ? (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-16">
-            <Folder className="size-12 mb-4 text-muted-foreground" />
-            <h3 className="text-lg font-medium mb-2">No environments yet</h3>
-            <p className="text-muted-foreground text-center">
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-20">
+            <div className="size-16 rounded-full bg-muted flex items-center justify-center mb-6">
+              <Folder className="size-8 text-muted-foreground" />
+            </div>
+            <h3 className="text-xl font-semibold mb-2">No environments yet</h3>
+            <p className="text-muted-foreground text-center max-w-sm">
               Create your first environment to start adding variables.
             </p>
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6">
           {variablesByEnvironment.map(({ environment, variables }) => (
             <EnvironmentSection
               key={environment.id}

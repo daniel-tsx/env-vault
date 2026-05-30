@@ -36,18 +36,22 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex flex-col min-h-screen">
-      <header className="border-b border-border sticky top-0 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
-        <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/projects" className="flex items-center gap-2">
-            <Lock className="size-6 text-primary" />
-            <span className="text-xl font-bold">EnvVault</span>
+      <header className="border-b border-border/50 sticky top-0 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 z-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
+          <Link href="/projects" className="flex items-center gap-2.5 group">
+            <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <Lock className="size-5 text-primary" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </Link>
           <DropdownMenu>
             <DropdownMenuTrigger
               render={<Button variant="ghost" className="relative size-10 rounded-full" />}
             >
               <Avatar className="size-10">
-                <AvatarFallback>{userInitials}</AvatarFallback>
+                <AvatarFallback className="bg-primary/10 text-primary font-semibold">
+                  {userInitials}
+                </AvatarFallback>
               </Avatar>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end">
@@ -62,27 +66,19 @@ export default async function DashboardLayout({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              <form
-                action={async () => {
-                  "use server";
-                  redirect("/sign-in");
-                }}
-                className="w-full"
-              >
               <DropdownMenuItem>
                 <form action={signOut} className="w-full">
                   <button type="submit" className="w-full flex items-center">
-                    <LogOut className="size-4" />
+                    <LogOut className="size-4 mr-2" />
                     Sign out
                   </button>
                 </form>
               </DropdownMenuItem>
-              </form>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       </header>
-      <main className="flex-1 max-w-6xl mx-auto w-full px-6 py-8">
+      <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-8 py-8">
         {children}
       </main>
     </div>

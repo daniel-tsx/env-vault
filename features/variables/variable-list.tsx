@@ -41,7 +41,7 @@ export function VariableList({ variables }: { variables: Variable[] }) {
   }
 
   return (
-    <div className="space-y-2 mb-4">
+    <div className="space-y-3 mb-4">
       {variables.map((variable) => (
         <VariableItem key={variable.id} variable={variable} />
       ))}
@@ -123,30 +123,32 @@ function VariableItem({ variable }: { variable: Variable }) {
   }
 
   return (
-    <div className="flex items-center gap-3 p-3 border border-border rounded-md bg-muted/30">
+    <div className="flex items-center gap-4 p-4 border border-border/50 rounded-lg bg-card hover:border-primary/30 transition-all duration-200 group">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
-          <code className="text-sm font-mono font-medium">{variable.key}</code>
+          <code className="text-sm font-mono font-semibold text-foreground">
+            {variable.key}
+          </code>
         </div>
         {variable.description && (
-          <p className="text-xs text-muted-foreground truncate">
+          <p className="text-xs text-muted-foreground truncate mb-2">
             {variable.description}
           </p>
         )}
         <div className="mt-1">
           {revealed && value ? (
-            <code className="text-xs font-mono text-muted-foreground break-all">
+            <code className="text-xs font-mono text-primary bg-primary/5 px-2 py-1 rounded break-all">
               {value}
             </code>
           ) : (
-            <Badge variant="outline" className="font-mono">
+            <Badge variant="outline" className="font-mono text-xs">
               ••••••••••••
             </Badge>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
         <Tooltip>
           <TooltipTrigger
             render={
@@ -155,7 +157,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 size="icon"
                 onClick={handleReveal}
                 disabled={loading}
-                className="size-8"
+                className="size-9"
               />
             }
           >
@@ -178,7 +180,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 size="icon"
                 onClick={handleCopy}
                 disabled={loading}
-                className="size-8"
+                className="size-9"
               />
             }
           >
@@ -200,7 +202,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-8 text-muted-foreground hover:text-destructive"
+                      className="size-9 text-muted-foreground hover:text-destructive"
                     />
                   }
                 />
@@ -225,7 +227,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 disabled={deleting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleting && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
+                {deleting && <Loader2 className="size-4 animate-spin mr-2" />}
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

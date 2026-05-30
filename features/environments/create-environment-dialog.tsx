@@ -47,27 +47,30 @@ export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button size="sm" />}>
-        <Plus className="size-4" data-icon="inline-start" />
+        <Plus className="size-4 mr-2" />
         Add environment
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Add environment</DialogTitle>
+          <DialogTitle className="text-2xl">Add environment</DialogTitle>
           <DialogDescription>
             Create a new environment for your project variables.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label htmlFor="env-name">Environment name</Label>
+              <Label htmlFor="env-name" className="text-sm font-medium">
+                Environment name
+              </Label>
               <Input
                 id="env-name"
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Production"
+                placeholder="Production, Staging, Development"
+                className="h-11"
               />
             </div>
 
@@ -85,9 +88,9 @@ export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
-              Create
+            <Button type="submit" disabled={loading} className="h-11">
+              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              Create environment
             </Button>
           </DialogFooter>
         </form>

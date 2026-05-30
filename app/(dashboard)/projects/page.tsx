@@ -14,9 +14,9 @@ export default async function ProjectsPage({
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-start justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold">Projects</h1>
+          <h1 className="text-3xl font-bold mb-2">Projects</h1>
           <p className="text-muted-foreground">
             Manage your projects and their environment variables.
           </p>
@@ -24,14 +24,14 @@ export default async function ProjectsPage({
         <CreateProjectDialog />
       </div>
 
-      <div className="mb-6">
-        <form className="relative">
+      <div className="mb-8">
+        <form className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
             name="search"
             defaultValue={params.search}
             placeholder="Search projects..."
-            className="pl-10"
+            className="pl-10 h-11"
           />
         </form>
       </div>

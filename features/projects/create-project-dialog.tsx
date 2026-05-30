@@ -48,32 +48,35 @@ export function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button />}>
-        <Plus className="size-4" data-icon="inline-start" />
+        <Plus className="size-4 mr-2" />
         New project
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create project</DialogTitle>
+          <DialogTitle className="text-2xl">Create project</DialogTitle>
           <DialogDescription>
-            Add a new project to manage its environment variables.
+            Add a new project to manage its environment variables securely.
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit}>
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4">
             <div className="space-y-2">
-              <Label htmlFor="project-name">Name</Label>
+              <Label htmlFor="project-name" className="text-sm font-medium">
+                Project name
+              </Label>
               <Input
                 id="project-name"
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="My Project"
+                placeholder="My Awesome Project"
+                className="h-11"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="project-description">
+              <Label htmlFor="project-description" className="text-sm font-medium">
                 Description (optional)
               </Label>
               <Textarea
@@ -99,9 +102,9 @@ export function CreateProjectDialog() {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="size-4 animate-spin" data-icon="inline-start" />}
-              Create
+            <Button type="submit" disabled={loading} className="h-11">
+              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              Create project
             </Button>
           </DialogFooter>
         </form>
