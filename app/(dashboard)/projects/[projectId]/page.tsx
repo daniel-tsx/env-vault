@@ -76,7 +76,6 @@ export default async function ProjectDetailPage({
               key={environment.id}
               environment={environment}
               variables={variables}
-              projectId={projectId}
             />
           ))}
         </div>

@@ -32,11 +32,9 @@ type Variable = Pick<
 export function EnvironmentSection({
   environment,
   variables,
-  projectId,
 }: {
   environment: Environment;
   variables: Variable[];
-  projectId: string;
 }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
