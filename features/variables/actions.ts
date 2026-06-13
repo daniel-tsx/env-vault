@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { environmentVariables } from "@/db/schema";
 import { requireSession } from "@/lib/auth/session";
+import { logAudit } from "@/lib/audit";
 import { encrypt, decrypt } from "@/lib/crypto";
 import { mapDbError } from "@/lib/db/errors";
 import {
@@ -73,6 +74,14 @@ export async function revealVariable(id: string) {
 
   const decryptedValue = decrypt(variable.environment_variables.encryptedValue);
 
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.reveal",
+    resourceType: "variable",
+    resourceId: variable.environment_variables.id,
+    label: variable.environment_variables.key,
+  });
+
   return {
     id: variable.environment_variables.id,
     value: decryptedValue,
@@ -107,6 +116,13 @@ export async function createVariable(input: CreateVariableInput) {
   }
 
   revalidatePath(`/projects/${environment.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.create",
+    resourceType: "variable",
+    resourceId: inserted[0].id,
+    label: validated.key,
+  });
   return inserted[0];
 }
 
@@ -141,6 +157,13 @@ export async function updateVariable(id: string, input: UpdateVariableInput) {
   }
 
   revalidatePath(`/projects/${existing.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.update",
+    resourceType: "variable",
+    resourceId: id,
+    label: updated[0].key,
+  });
   return updated[0];
 }
 
@@ -151,4 +174,11 @@ export async function deleteVariable(id: string) {
   await db.delete(environmentVariables).where(eq(environmentVariables.id, id));
 
   revalidatePath(`/projects/${existing.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.delete",
+    resourceType: "variable",
+    resourceId: id,
+    label: existing.environment_variables.key,
+  });
 }

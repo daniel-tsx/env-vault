@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { environments } from "@/db/schema";
 import { requireSession } from "@/lib/auth/session";
+import { logAudit } from "@/lib/audit";
 import { mapDbError } from "@/lib/db/errors";
 import {
   verifyEnvironmentOwnership,
@@ -66,6 +67,13 @@ export async function createEnvironment(
   }
 
   revalidatePath(`/projects/${projectId}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "environment.create",
+    resourceType: "environment",
+    resourceId: inserted[0].id,
+    label: validated.name,
+  });
   return inserted[0];
 }
 
@@ -98,6 +106,13 @@ export async function updateEnvironment(
   }
 
   revalidatePath(`/projects/${existing.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "environment.update",
+    resourceType: "environment",
+    resourceId: id,
+    label: updated[0].name,
+  });
   return updated[0];
 }
 
@@ -108,4 +123,11 @@ export async function deleteEnvironment(id: string) {
   await db.delete(environments).where(eq(environments.id, id));
 
   revalidatePath(`/projects/${existing.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "environment.delete",
+    resourceType: "environment",
+    resourceId: id,
+    label: existing.environments.name,
+  });
 }

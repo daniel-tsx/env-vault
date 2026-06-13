@@ -120,3 +120,26 @@ export const environmentVariables = pgTable(
     index("env_vars_environment_id_idx").on(table.environmentId),
   ]
 );
+
+// Append-only trail of security-relevant events (secret access and mutations).
+// Never stores secret values — only non-sensitive labels (e.g. the variable key).
+export const auditLog = pgTable(
+  "audit_log",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    action: text("action").notNull(),
+    resourceType: text("resource_type"),
+    resourceId: text("resource_id"),
+    label: text("label"),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("audit_log_user_id_idx").on(table.userId),
+    index("audit_log_user_created_idx").on(table.userId, table.createdAt),
+  ]
+);

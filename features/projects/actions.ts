@@ -3,6 +3,7 @@
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { requireSession } from "@/lib/auth/session";
+import { logAudit } from "@/lib/audit";
 import { mapDbError } from "@/lib/db/errors";
 import { verifyProjectOwnership } from "@/lib/ownership";
 import {
@@ -58,6 +59,13 @@ export async function createProject(input: CreateProjectInput) {
   }
 
   revalidatePath("/projects");
+  await logAudit({
+    userId: session.user.id,
+    action: "project.create",
+    resourceType: "project",
+    resourceId: inserted[0].id,
+    label: validated.name,
+  });
   return inserted[0];
 }
 
@@ -80,14 +88,28 @@ export async function updateProject(id: string, input: UpdateProjectInput) {
 
   revalidatePath(`/projects/${id}`);
   revalidatePath("/projects");
+  await logAudit({
+    userId: session.user.id,
+    action: "project.update",
+    resourceType: "project",
+    resourceId: id,
+    label: updated[0].name,
+  });
   return updated[0];
 }
 
 export async function deleteProject(id: string) {
   const session = await requireSession();
-  await verifyProjectOwnership(id, session.user.id);
+  const project = await verifyProjectOwnership(id, session.user.id);
 
   await db.delete(projects).where(eq(projects.id, id));
 
   revalidatePath("/projects");
+  await logAudit({
+    userId: session.user.id,
+    action: "project.delete",
+    resourceType: "project",
+    resourceId: id,
+    label: project.name,
+  });
 }
