@@ -5,6 +5,7 @@ import { nanoid } from "nanoid";
 
 export type AuditAction =
   | "auth.sign_in"
+  | "auth.step_up"
   | "project.create"
   | "project.update"
   | "project.delete"

@@ -116,3 +116,6 @@ export const REVEAL_LIMIT = 30;
 export const REVEAL_WINDOW_SECONDS = 60;
 export const EXPORT_LIMIT = 10;
 export const EXPORT_WINDOW_SECONDS = 60;
+// Tight limit on step-up password attempts to resist brute force.
+export const STEP_UP_LIMIT = 5;
+export const STEP_UP_WINDOW_SECONDS = 60;

@@ -46,3 +46,25 @@ export const auth = betterAuth({
 
 export type Session = typeof auth.$Infer.Session.session;
 export type User = typeof auth.$Infer.Session.user;
+
+// Verifies a user's password against their stored credential hash without
+// creating or rotating a session — used for step-up re-authentication.
+export async function verifyUserPassword(
+  userId: string,
+  password: string
+): Promise<boolean> {
+  try {
+    const ctx = await auth.$context;
+    const accounts = await ctx.internalAdapter.findAccounts(userId);
+    const credential = accounts?.find(
+      (account) => account.providerId === "credential"
+    );
+    if (!credential?.password) return false;
+    return await ctx.password.verify({
+      hash: credential.password,
+      password,
+    });
+  } catch {
+    return false;
+  }
+}

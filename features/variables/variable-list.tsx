@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { revealVariable, deleteVariable } from "@/features/variables/actions";
+import { StepUpDialog } from "@/features/auth/step-up-dialog";
 import { Eye, EyeOff, Copy, Trash2, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,19 @@ function VariableItem({ variable }: { variable: Variable }) {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [stepUpOpen, setStepUpOpen] = useState(false);
+  const [pendingAction, setPendingAction] = useState<"reveal" | "copy" | null>(
+    null
+  );
+
+  function showValue(next: string) {
+    setValue(next);
+    setRevealed(true);
+    setTimeout(() => {
+      setRevealed(false);
+      setValue(null);
+    }, 30000);
+  }
 
   async function handleReveal() {
     if (revealed) {
@@ -67,13 +81,18 @@ function VariableItem({ variable }: { variable: Variable }) {
     setLoading(true);
     try {
       const result = await revealVariable(variable.id);
-      setValue(result.value);
-      setRevealed(true);
-      
-      setTimeout(() => {
-        setRevealed(false);
-        setValue(null);
-      }, 30000);
+      if (result.status === "step_up_required") {
+        setPendingAction("reveal");
+        setStepUpOpen(true);
+        return;
+      }
+      if (result.status === "rate_limited") {
+        toast.error(
+          `Too many requests. Try again in ${result.retryAfterSeconds}s.`
+        );
+        return;
+      }
+      showValue(result.value);
     } catch {
       toast.error("Failed to reveal variable");
     } finally {
@@ -82,32 +101,49 @@ function VariableItem({ variable }: { variable: Variable }) {
   }
 
   async function handleCopy() {
-    if (!value) {
-      setLoading(true);
-      try {
-        const result = await revealVariable(variable.id);
-        setValue(result.value);
-        setRevealed(true);
-        await navigator.clipboard.writeText(result.value);
-        setCopied(true);
-        toast.success("Copied to clipboard");
-        setTimeout(() => setCopied(false), 2000);
-        
-        setTimeout(() => {
-          setRevealed(false);
-          setValue(null);
-        }, 30000);
-      } catch {
-        toast.error("Failed to copy variable");
-      } finally {
-        setLoading(false);
-      }
-    } else {
+    if (value) {
       await navigator.clipboard.writeText(value);
       setCopied(true);
       toast.success("Copied to clipboard");
       setTimeout(() => setCopied(false), 2000);
+      return;
     }
+
+    setLoading(true);
+    try {
+      const result = await revealVariable(variable.id);
+      if (result.status === "step_up_required") {
+        setPendingAction("copy");
+        setStepUpOpen(true);
+        return;
+      }
+      if (result.status === "rate_limited") {
+        toast.error(
+          `Too many requests. Try again in ${result.retryAfterSeconds}s.`
+        );
+        return;
+      }
+      showValue(result.value);
+      try {
+        await navigator.clipboard.writeText(result.value);
+        setCopied(true);
+        toast.success("Copied to clipboard");
+        setTimeout(() => setCopied(false), 2000);
+      } catch {
+        toast.info("Secret revealed — copy it manually.");
+      }
+    } catch {
+      toast.error("Failed to copy variable");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function handleStepUpVerified() {
+    const action = pendingAction;
+    setPendingAction(null);
+    if (action === "reveal") handleReveal();
+    else if (action === "copy") handleCopy();
   }
 
   async function handleDelete() {
@@ -234,6 +270,12 @@ function VariableItem({ variable }: { variable: Variable }) {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      <StepUpDialog
+        open={stepUpOpen}
+        onOpenChange={setStepUpOpen}
+        onVerified={handleStepUpVerified}
+      />
     </div>
   );
 }

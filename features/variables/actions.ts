@@ -11,6 +11,7 @@ import {
   REVEAL_LIMIT,
   REVEAL_WINDOW_SECONDS,
 } from "@/lib/rate-limit";
+import { hasValidRevealGrant } from "@/lib/step-up";
 import {
   verifyEnvironmentOwnership,
   verifyProjectOwnership,
@@ -73,8 +74,18 @@ export async function getVariablesForProject(projectId: string) {
     .orderBy(environmentVariables.key);
 }
 
-export async function revealVariable(id: string) {
+export type RevealResult =
+  | { status: "ok"; id: string; value: string }
+  | { status: "step_up_required" }
+  | { status: "rate_limited"; retryAfterSeconds: number };
+
+export async function revealVariable(id: string): Promise<RevealResult> {
   const session = await requireSession();
+
+  // Step-up first (cheap cookie check) so prompts don't consume reveal budget.
+  if (!(await hasValidRevealGrant(session.session.id))) {
+    return { status: "step_up_required" };
+  }
 
   const limit = await checkRateLimit(
     `reveal:${session.user.id}`,
@@ -82,13 +93,10 @@ export async function revealVariable(id: string) {
     REVEAL_WINDOW_SECONDS
   );
   if (!limit.allowed) {
-    throw new Error(
-      `Too many reveal requests. Please try again in ${limit.retryAfterSeconds}s.`
-    );
+    return { status: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds };
   }
 
   const variable = await verifyVariableOwnership(id, session.user.id);
-
   const decryptedValue = decrypt(variable.environment_variables.encryptedValue);
 
   await logAudit({
@@ -100,6 +108,7 @@ export async function revealVariable(id: string) {
   });
 
   return {
+    status: "ok",
     id: variable.environment_variables.id,
     value: decryptedValue,
   };
