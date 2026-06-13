@@ -1,7 +1,7 @@
 "use server";
 
 import { db } from "@/db";
-import { environmentVariables } from "@/db/schema";
+import { environmentVariables, variableVersions, projects } from "@/db/schema";
 import { requireSession } from "@/lib/auth/session";
 import { logAudit } from "@/lib/audit";
 import { encrypt, decrypt } from "@/lib/crypto";
@@ -24,7 +24,7 @@ import {
   createVariableSchema,
   updateVariableSchema,
 } from "@/lib/validators/variable";
-import { and, eq, ilike } from "drizzle-orm";
+import { and, desc, eq, ilike } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
 import type {
@@ -42,6 +42,29 @@ const variableColumns = {
 
 function escapeLike(value: string) {
   return value.replace(/[%_\\]/g, "\\$&");
+}
+
+type VariableRow = typeof environmentVariables.$inferSelect;
+
+// Records a point-in-time snapshot of a variable (the already-encrypted value is
+// stored verbatim — no decrypt/re-encrypt needed).
+async function snapshotVariable(
+  variable: Pick<
+    VariableRow,
+    "id" | "projectId" | "environmentId" | "key" | "encryptedValue" | "description"
+  >,
+  action: "update" | "delete" | "restore"
+) {
+  await db.insert(variableVersions).values({
+    id: nanoid(),
+    variableId: variable.id,
+    projectId: variable.projectId,
+    environmentId: variable.environmentId,
+    key: variable.key,
+    encryptedValue: variable.encryptedValue,
+    description: variable.description ?? null,
+    action,
+  });
 }
 
 export async function getVariables(environmentId: string, search?: string) {
@@ -160,6 +183,10 @@ export async function updateVariable(id: string, input: UpdateVariableInput) {
   const existing = await verifyVariableOwnership(id, session.user.id);
 
   const validated = updateVariableSchema.parse(input);
+
+  // Snapshot the pre-update state for history.
+  await snapshotVariable(existing.environment_variables, "update");
+
   const updates: Partial<typeof environmentVariables.$inferInsert> = {
     updatedAt: new Date(),
   };
@@ -199,6 +226,9 @@ export async function updateVariable(id: string, input: UpdateVariableInput) {
 export async function deleteVariable(id: string) {
   const session = await requireSession();
   const existing = await verifyVariableOwnership(id, session.user.id);
+
+  // Snapshot the final state before deletion so history is retained.
+  await snapshotVariable(existing.environment_variables, "delete");
 
   await db.delete(environmentVariables).where(eq(environmentVariables.id, id));
 
@@ -347,4 +377,111 @@ export async function exportEnvironment(
     filename: `${environment.environments.slug || "environment"}.env`,
     content,
   };
+}
+
+export async function getVariableHistory(variableId: string) {
+  const session = await requireSession();
+  await verifyVariableOwnership(variableId, session.user.id);
+
+  return db
+    .select({
+      id: variableVersions.id,
+      action: variableVersions.action,
+      key: variableVersions.key,
+      description: variableVersions.description,
+      createdAt: variableVersions.createdAt,
+    })
+    .from(variableVersions)
+    .where(eq(variableVersions.variableId, variableId))
+    .orderBy(desc(variableVersions.createdAt));
+}
+
+export async function revealVersion(versionId: string): Promise<RevealResult> {
+  const session = await requireSession();
+
+  if (!(await hasValidRevealGrant(session.session.id))) {
+    return { status: "step_up_required" };
+  }
+
+  const limit = await checkRateLimit(
+    `reveal:${session.user.id}`,
+    REVEAL_LIMIT,
+    REVEAL_WINDOW_SECONDS
+  );
+  if (!limit.allowed) {
+    return { status: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds };
+  }
+
+  const [row] = await db
+    .select({
+      id: variableVersions.id,
+      key: variableVersions.key,
+      encryptedValue: variableVersions.encryptedValue,
+    })
+    .from(variableVersions)
+    .innerJoin(projects, eq(variableVersions.projectId, projects.id))
+    .where(
+      and(eq(variableVersions.id, versionId), eq(projects.userId, session.user.id))
+    )
+    .limit(1);
+
+  if (!row) {
+    throw new Error("Version not found");
+  }
+
+  const value = decrypt(row.encryptedValue);
+
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.reveal",
+    resourceType: "variable",
+    resourceId: row.id,
+    label: `${row.key} (history)`,
+  });
+
+  return { status: "ok", id: row.id, value };
+}
+
+export async function restoreVariableVersion(versionId: string) {
+  const session = await requireSession();
+
+  const [version] = await db
+    .select()
+    .from(variableVersions)
+    .innerJoin(projects, eq(variableVersions.projectId, projects.id))
+    .where(
+      and(eq(variableVersions.id, versionId), eq(projects.userId, session.user.id))
+    )
+    .limit(1);
+
+  if (!version) {
+    throw new Error("Version not found");
+  }
+
+  const snapshot = version.variable_versions;
+  const current = await verifyVariableOwnership(
+    snapshot.variableId,
+    session.user.id
+  );
+
+  // Snapshot the current state first so a restore is itself undoable.
+  await snapshotVariable(current.environment_variables, "restore");
+
+  await db
+    .update(environmentVariables)
+    .set({
+      encryptedValue: snapshot.encryptedValue,
+      description: snapshot.description,
+      updatedAt: new Date(),
+    })
+    .where(eq(environmentVariables.id, snapshot.variableId));
+
+  revalidatePath(`/projects/${snapshot.projectId}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.update",
+    resourceType: "variable",
+    resourceId: snapshot.variableId,
+    label: `${current.environment_variables.key} (restored)`,
+  });
 }

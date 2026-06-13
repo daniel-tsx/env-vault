@@ -180,3 +180,27 @@ export const appRateLimit = pgTable("app_rate_limit", {
   count: integer("count").notNull().default(0),
   windowStart: timestamp("window_start").notNull().defaultNow(),
 });
+
+// Prior states of a variable, captured on update/delete/restore. Not FK'd to
+// environment_variables so history survives variable deletion; scoped to the
+// project (cascade) for ownership checks and cleanup.
+export const variableVersions = pgTable(
+  "variable_versions",
+  {
+    id: text("id").primaryKey(),
+    variableId: text("variable_id").notNull(),
+    projectId: text("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    environmentId: text("environment_id").notNull(),
+    key: text("key").notNull(),
+    encryptedValue: text("encrypted_value").notNull(),
+    description: text("description"),
+    action: text("action").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (table) => [
+    index("variable_versions_variable_id_idx").on(table.variableId),
+    index("variable_versions_project_id_idx").on(table.projectId),
+  ]
+);

@@ -22,6 +22,13 @@
       "when": 1781366344824,
       "tag": "0002_quick_swordsman",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1781367718708,
+      "tag": "0003_narrow_talisman",
+      "breakpoints": true
     }
   ]
 }
