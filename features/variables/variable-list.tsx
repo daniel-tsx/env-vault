@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { revealVariable, deleteVariable } from "@/features/variables/actions";
+import { EditVariableDialog } from "@/features/variables/edit-variable-dialog";
 import { StepUpDialog } from "@/features/auth/step-up-dialog";
 import { Eye, EyeOff, Copy, Trash2, Loader2, Check } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -228,6 +229,8 @@ function VariableItem({ variable }: { variable: Variable }) {
           </TooltipTrigger>
           <TooltipContent>Copy value</TooltipContent>
         </Tooltip>
+
+        <EditVariableDialog variable={variable} />
 
         <AlertDialog>
           <Tooltip>

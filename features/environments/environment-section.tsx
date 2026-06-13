@@ -4,6 +4,7 @@ import { useState } from "react";
 import { deleteEnvironment } from "@/features/environments/actions";
 import { VariableList } from "@/features/variables/variable-list";
 import { AddVariableForm } from "@/features/variables/add-variable-form";
+import { EditEnvironmentDialog } from "@/features/environments/edit-environment-dialog";
 import { Trash2, Loader2, ChevronDown, ChevronRight, Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -71,6 +72,8 @@ export function EnvironmentSection({
               {variables.length} variable{variables.length !== 1 ? "s" : ""}
             </Badge>
           </button>
+          <div className="flex items-center gap-1">
+          <EditEnvironmentDialog environment={environment} />
           <AlertDialog>
             <AlertDialogTrigger
               render={
@@ -105,6 +108,7 @@ export function EnvironmentSection({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
       </CardHeader>
 

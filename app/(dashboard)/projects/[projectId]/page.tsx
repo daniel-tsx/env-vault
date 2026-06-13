@@ -4,6 +4,7 @@ import { getVariablesForProject } from "@/features/variables/actions";
 import { CreateEnvironmentDialog } from "@/features/environments/create-environment-dialog";
 import { EnvironmentSection } from "@/features/environments/environment-section";
 import { DeleteProjectButton } from "@/features/projects/delete-project-button";
+import { EditProjectDialog } from "@/features/projects/edit-project-dialog";
 import { ArrowLeft, Folder } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,7 +49,10 @@ export default async function ProjectDetailPage({
             )}
           </div>
         </div>
-        <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        <div className="flex items-center gap-1">
+          <EditProjectDialog project={project} />
+          <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        </div>
       </div>
 
       <Separator className="mb-8" />
