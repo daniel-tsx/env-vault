@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/features/auth/actions";
+import { GlobalSearch } from "@/features/search/global-search";
 
 export default async function DashboardLayout({
   children,
@@ -44,6 +45,8 @@ export default async function DashboardLayout({
             </div>
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </Link>
+          <div className="flex items-center gap-3">
+          <GlobalSearch />
           <DropdownMenu>
             <DropdownMenuTrigger
               render={<Button variant="ghost" className="relative size-10 rounded-full" />}
@@ -76,6 +79,7 @@ export default async function DashboardLayout({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-8 py-8">
