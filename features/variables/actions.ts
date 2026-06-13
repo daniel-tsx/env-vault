@@ -47,7 +47,9 @@ function escapeLike(value: string) {
 type VariableRow = typeof environmentVariables.$inferSelect;
 
 // Records a point-in-time snapshot of a variable (the already-encrypted value is
-// stored verbatim — no decrypt/re-encrypt needed).
+// stored verbatim — no decrypt/re-encrypt needed). Best-effort: history is
+// supplementary, so a snapshot failure (e.g. variable_versions not yet migrated)
+// must never break the edit/delete/restore it accompanies.
 async function snapshotVariable(
   variable: Pick<
     VariableRow,
@@ -55,16 +57,20 @@ async function snapshotVariable(
   >,
   action: "update" | "delete" | "restore"
 ) {
-  await db.insert(variableVersions).values({
-    id: nanoid(),
-    variableId: variable.id,
-    projectId: variable.projectId,
-    environmentId: variable.environmentId,
-    key: variable.key,
-    encryptedValue: variable.encryptedValue,
-    description: variable.description ?? null,
-    action,
-  });
+  try {
+    await db.insert(variableVersions).values({
+      id: nanoid(),
+      variableId: variable.id,
+      projectId: variable.projectId,
+      environmentId: variable.environmentId,
+      key: variable.key,
+      encryptedValue: variable.encryptedValue,
+      description: variable.description ?? null,
+      action,
+    });
+  } catch {
+    // Intentionally ignored — see note above.
+  }
 }
 
 export async function getVariables(environmentId: string, search?: string) {
