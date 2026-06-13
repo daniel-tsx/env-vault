@@ -15,6 +15,7 @@ import {
 } from "@/lib/rate-limit";
 import { hasValidRevealGrant } from "@/lib/step-up";
 import { parseEnv, serializeEnv } from "@/lib/env-file";
+import { escapeLike } from "@/lib/sql";
 import {
   verifyEnvironmentOwnership,
   verifyProjectOwnership,
@@ -39,10 +40,6 @@ const variableColumns = {
   createdAt: environmentVariables.createdAt,
   updatedAt: environmentVariables.updatedAt,
 };
-
-function escapeLike(value: string) {
-  return value.replace(/[%_\\]/g, "\\$&");
-}
 
 type VariableRow = typeof environmentVariables.$inferSelect;
 

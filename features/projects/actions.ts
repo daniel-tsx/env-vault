@@ -10,6 +10,7 @@ import {
   createProjectSchema,
   updateProjectSchema,
 } from "@/lib/validators/project";
+import { escapeLike } from "@/lib/sql";
 import { and, eq, ilike } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
@@ -23,8 +24,7 @@ export async function getProjects(search?: string) {
 
   const conditions = [eq(projects.userId, session.user.id)];
   if (search) {
-    const escaped = search.replace(/[%_\\]/g, "\\$&");
-    conditions.push(ilike(projects.name, `%${escaped}%`));
+    conditions.push(ilike(projects.name, `%${escapeLike(search)}%`));
   }
 
   return db
