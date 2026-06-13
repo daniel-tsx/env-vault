@@ -22,7 +22,8 @@ export const metadata: Metadata = {
   description:
     "Manage environment variables across all your projects. Secure, encrypted, and built for developers.",
   icons: {
-    icon: "/favicon.ico",
+    // The favicon is served automatically from app/favicon.ico (App Router
+    // convention); only the apple-touch icon needs an explicit entry.
     apple: "/logo.png",
   },
 };

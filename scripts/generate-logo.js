@@ -37,17 +37,20 @@ async function convertSvgToIco() {
   // Create ICO file
   console.log('\nCreating ICO file...');
   const icoBuffer = await createIco(pngBuffers);
-  
-  const icoPath = path.join(process.cwd(), 'public', 'favicon.ico');
+
+  // App Router serves app/favicon.ico at /favicon.ico automatically.
+  const icoPath = path.join(process.cwd(), 'app', 'favicon.ico');
   fs.writeFileSync(icoPath, icoBuffer);
   console.log(`✓ Created ${icoPath}`);
 
-  // Also create a PNG version for other uses
+  // 512px PNG for the apple-touch icon (referenced via metadata) and other uses.
   const pngPath = path.join(process.cwd(), 'public', 'logo.png');
-  const largePng = await sharp(pngBuffers[pngBuffers.length - 1].buffer)
-    .png()
-    .toBuffer();
-  fs.writeFileSync(pngPath, largePng);
+  const largePng = new Resvg(svgContent, {
+    fitTo: { mode: 'width', value: 512 },
+  })
+    .render()
+    .asPng();
+  fs.writeFileSync(pngPath, await sharp(largePng).resize(512, 512).png().toBuffer());
   console.log(`✓ Created ${pngPath}`);
 }
 
