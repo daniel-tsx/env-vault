@@ -29,7 +29,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="max-w-3xl space-y-8">
-      <div>
+      <div className="ev-reveal">
         <Link
           href="/projects"
           className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
@@ -37,13 +37,16 @@ export default async function SettingsPage() {
           <ArrowLeft className="size-4 mr-2" />
           Back to projects
         </Link>
+        <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
+          {"// settings"}
+        </p>
         <h1 className="text-3xl font-bold mb-2">Settings</h1>
         <p className="text-muted-foreground">
           Manage your profile and account security.
         </p>
       </div>
 
-      <Card>
+      <Card className="ev-reveal rounded-2xl border-border/60">
         <CardHeader>
           <CardTitle>Profile</CardTitle>
           <CardDescription>Your name and email.</CardDescription>
@@ -53,7 +56,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="ev-reveal rounded-2xl border-border/60">
         <CardHeader>
           <CardTitle>Password</CardTitle>
           <CardDescription>
@@ -65,7 +68,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="ev-reveal rounded-2xl border-border/60">
         <CardHeader>
           <CardTitle>Two-factor authentication</CardTitle>
           <CardDescription>
@@ -77,7 +80,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="ev-reveal rounded-2xl border-border/60">
         <CardHeader>
           <CardTitle>Recent activity</CardTitle>
           <CardDescription>
@@ -117,7 +120,7 @@ export default async function SettingsPage() {
         </CardContent>
       </Card>
 
-      <Card className="border-destructive/40">
+      <Card className="ev-reveal rounded-2xl border-destructive/40">
         <CardHeader>
           <CardTitle className="text-destructive">Danger zone</CardTitle>
           <CardDescription>
