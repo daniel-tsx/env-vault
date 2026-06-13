@@ -89,7 +89,7 @@ export default function LandingPage() {
               <FeatureCard
                 icon={<Shield className="size-6" />}
                 title="AES-256 encryption"
-                description="Every secret is encrypted at rest with industry-standard AES-256-GCM. Zero-knowledge architecture."
+                description="Every secret is encrypted at rest with authenticated AES-256-GCM, with seamless key rotation."
               />
               <FeatureCard
                 icon={<Search className="size-6" />}

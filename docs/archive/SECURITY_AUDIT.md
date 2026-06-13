@@ -1,5 +1,10 @@
 # Security & Code Quality Audit Report
 
+> **Status: historical / superseded.** This is the original 2026-05-30 audit.
+> Most items have since been addressed (key rotation, audit logging, rate
+> limiting, step-up reveal, 2FA, N+1 fix, safe error handling). See
+> [`docs/SECURITY.md`](../SECURITY.md) for the current security model.
+
 **Date:** 2026-05-30  
 **Auditor:** Senior Full-Stack Engineer Review  
 **Scope:** Full codebase review of EnvVault
