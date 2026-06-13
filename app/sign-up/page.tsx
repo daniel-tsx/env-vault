@@ -4,7 +4,8 @@ import { useState } from "react";
 import { signUp } from "@/lib/auth/client";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Lock, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,9 +48,7 @@ export default function SignUpPage() {
       <Card className="w-full max-w-md shadow-2xl shadow-primary/5">
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2.5 mb-2">
-            <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Lock className="size-5 text-primary" />
-            </div>
+            <Logo className="size-10" />
             <span className="text-2xl font-bold tracking-tight">EnvVault</span>
           </div>
           <CardTitle className="text-3xl">Create your vault</CardTitle>

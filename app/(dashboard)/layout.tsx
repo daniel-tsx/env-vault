@@ -1,7 +1,8 @@
 import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Lock, LogOut, Settings } from "lucide-react";
+import { LogOut, Settings } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -41,9 +42,7 @@ export default async function DashboardLayout({
       <header className="border-b border-border/50 sticky top-0 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60 z-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link href="/projects" className="flex items-center gap-2.5 group">
-            <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-              <Lock className="size-5 text-primary" />
-            </div>
+            <Logo className="size-9 transition-transform group-hover:scale-105" />
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </Link>
           <div className="flex items-center gap-3">

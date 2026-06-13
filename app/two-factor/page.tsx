@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { twoFactor } from "@/lib/auth/client";
 import { useRouter } from "next/navigation";
-import { ShieldCheck, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,9 +48,7 @@ export default function TwoFactorPage() {
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2.5 mb-2">
-            <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
-              <ShieldCheck className="size-5 text-primary" />
-            </div>
+            <Logo className="size-10" />
             <span className="text-2xl font-bold tracking-tight">EnvVault</span>
           </div>
           <CardTitle className="text-3xl">Two-factor authentication</CardTitle>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Lock, FolderKey, Search, Copy, Shield, Zap, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
 
 export default function LandingPage() {
   return (
@@ -9,9 +10,7 @@ export default function LandingPage() {
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 bg-background/80">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center">
-              <Lock className="size-5 text-primary" />
-            </div>
+            <Logo className="size-9" />
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </div>
           <nav className="flex items-center gap-2">
