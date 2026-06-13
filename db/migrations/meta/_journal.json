@@ -15,6 +15,13 @@
       "when": 1781366077339,
       "tag": "0001_dapper_sheva_callister",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1781366344824,
+      "tag": "0002_quick_swordsman",
+      "breakpoints": true
     }
   ]
 }

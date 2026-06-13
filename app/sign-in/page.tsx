@@ -38,6 +38,13 @@ export default function SignInPage() {
       return;
     }
 
+    if (
+      (result.data as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect
+    ) {
+      router.push("/two-factor");
+      return;
+    }
+
     router.push("/projects");
   }
 

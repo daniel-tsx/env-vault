@@ -1,15 +1,18 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { twoFactor } from "better-auth/plugins";
 import { db } from "@/db";
 import { logAudit } from "@/lib/audit";
 
 export const auth = betterAuth({
+  appName: "EnvVault",
   database: drizzleAdapter(db, {
     provider: "pg",
   }),
   emailAndPassword: {
     enabled: true,
   },
+  plugins: [twoFactor()],
   session: {
     expiresIn: 60 * 60 * 24 * 7,
     updateAge: 60 * 60 * 24,
