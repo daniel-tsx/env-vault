@@ -271,50 +271,59 @@ export async function importVariables(
   const entries = parseEnv(content);
 
   const existingRows = await db
-    .select({ id: environmentVariables.id, key: environmentVariables.key })
+    .select({
+      id: environmentVariables.id,
+      key: environmentVariables.key,
+      encryptedValue: environmentVariables.encryptedValue,
+      description: environmentVariables.description,
+      projectId: environmentVariables.projectId,
+      environmentId: environmentVariables.environmentId,
+    })
     .from(environmentVariables)
     .where(eq(environmentVariables.environmentId, environmentId));
-  const existingByKey = new Map(existingRows.map((row) => [row.key, row.id]));
+  const existingByKey = new Map(existingRows.map((row) => [row.key, row]));
 
   const toInsert: (typeof environmentVariables.$inferInsert)[] = [];
   const invalid: string[] = [];
   let updated = 0;
   let skipped = 0;
 
-  for (const entry of entries) {
-    if (!KEY_PATTERN.test(entry.key)) {
-      invalid.push(entry.key);
-      continue;
-    }
-    const existingId = existingByKey.get(entry.key);
-    if (existingId) {
-      if (mode === "skip") {
-        skipped++;
+  try {
+    for (const entry of entries) {
+      if (!KEY_PATTERN.test(entry.key)) {
+        invalid.push(entry.key);
         continue;
       }
-      await db
-        .update(environmentVariables)
-        .set({ encryptedValue: encrypt(entry.value), updatedAt: new Date() })
-        .where(eq(environmentVariables.id, existingId));
-      updated++;
-    } else {
-      toInsert.push({
-        id: nanoid(),
-        projectId: environment.projects.id,
-        environmentId,
-        key: entry.key,
-        encryptedValue: encrypt(entry.value),
-        description: null,
-      });
+      const existing = existingByKey.get(entry.key);
+      if (existing) {
+        if (mode === "skip") {
+          skipped++;
+          continue;
+        }
+        // Snapshot the prior value so bulk overwrite records history too.
+        await snapshotVariable(existing, "update");
+        await db
+          .update(environmentVariables)
+          .set({ encryptedValue: encrypt(entry.value), updatedAt: new Date() })
+          .where(eq(environmentVariables.id, existing.id));
+        updated++;
+      } else {
+        toInsert.push({
+          id: nanoid(),
+          projectId: environment.projects.id,
+          environmentId,
+          key: entry.key,
+          encryptedValue: encrypt(entry.value),
+          description: null,
+        });
+      }
     }
-  }
 
-  if (toInsert.length > 0) {
-    try {
+    if (toInsert.length > 0) {
       await db.insert(environmentVariables).values(toInsert);
-    } catch (error) {
-      throw mapDbError(error);
     }
+  } catch (error) {
+    throw mapDbError(error);
   }
 
   revalidatePath(`/projects/${environment.projects.id}`);
