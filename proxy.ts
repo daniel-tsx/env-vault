@@ -4,7 +4,10 @@ import type { auth } from "@/lib/auth";
 
 type Session = typeof auth.$Infer.Session;
 
-export default async function authMiddleware(request: NextRequest) {
+// Renamed from the deprecated `middleware` convention to `proxy` (Next.js 16).
+// Provides an early redirect for unauthenticated users; the (dashboard) layout
+// still performs the authoritative server-side session check.
+export default async function proxy(request: NextRequest) {
   const { data: session } = await betterFetch<Session>(
     "/api/auth/get-session",
     {
@@ -23,5 +26,5 @@ export default async function authMiddleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/projects/:path*", "/dashboard"],
+  matcher: ["/projects/:path*"],
 };

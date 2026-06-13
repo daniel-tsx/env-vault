@@ -1,6 +1,6 @@
 import { getProject } from "@/features/projects/actions";
 import { getEnvironments } from "@/features/environments/actions";
-import { getVariables } from "@/features/variables/actions";
+import { getVariablesForProject } from "@/features/variables/actions";
 import { CreateEnvironmentDialog } from "@/features/environments/create-environment-dialog";
 import { EnvironmentSection } from "@/features/environments/environment-section";
 import { DeleteProjectButton } from "@/features/projects/delete-project-button";
@@ -16,14 +16,15 @@ export default async function ProjectDetailPage({
 }) {
   const { projectId } = await params;
   const project = await getProject(projectId);
-  const environments = await getEnvironments(projectId);
+  const [environments, allVariables] = await Promise.all([
+    getEnvironments(projectId),
+    getVariablesForProject(projectId),
+  ]);
 
-  const variablesByEnvironment = await Promise.all(
-    environments.map(async (env) => ({
-      environment: env,
-      variables: await getVariables(env.id),
-    }))
-  );
+  const variablesByEnvironment = environments.map((environment) => ({
+    environment,
+    variables: allVariables.filter((v) => v.environmentId === environment.id),
+  }));
 
   return (
     <div>
