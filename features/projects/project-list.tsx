@@ -9,13 +9,13 @@ type Project = InferSelectModel<typeof projects>;
 export function ProjectList({ projects }: { projects: Project[] }) {
   if (projects.length === 0) {
     return (
-      <Card className="border-dashed">
-        <CardContent className="flex flex-col items-center justify-center py-20">
-          <div className="size-16 rounded-full bg-muted flex items-center justify-center mb-6">
-            <Folder className="size-8 text-muted-foreground" />
+      <Card className="rounded-2xl border-dashed border-border/60">
+        <CardContent className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="size-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+            <Folder className="size-7 text-primary" />
           </div>
           <h3 className="text-xl font-semibold mb-2">No projects yet</h3>
-          <p className="text-muted-foreground text-center max-w-sm">
+          <p className="text-muted-foreground max-w-sm">
             Create your first project to start managing environment variables securely.
           </p>
         </CardContent>
@@ -27,15 +27,15 @@ export function ProjectList({ projects }: { projects: Project[] }) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {projects.map((project) => (
         <Link key={project.id} href={`/projects/${project.id}`} className="group">
-          <Card className="h-full hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 group-hover:scale-[1.02]">
+          <Card className="h-full rounded-2xl border-border/60 transition-colors hover:border-primary/40">
             <CardContent className="pt-6">
               <div className="flex items-start justify-between mb-4">
-                <div className="size-12 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-300">
-                  <Folder className="size-6 text-primary group-hover:text-primary-foreground" />
+                <div className="size-12 rounded-xl bg-primary/10 flex items-center justify-center transition-colors group-hover:bg-primary">
+                  <Folder className="size-6 text-primary transition-colors group-hover:text-primary-foreground" />
                 </div>
-                <ArrowRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
+                <ArrowRight className="size-5 text-muted-foreground transition-all group-hover:text-primary group-hover:translate-x-1" />
               </div>
-              <h3 className="font-semibold text-lg mb-1 group-hover:text-primary transition-colors">
+              <h3 className="font-semibold text-lg mb-1 transition-colors group-hover:text-primary">
                 {project.name}
               </h3>
               {project.description && (

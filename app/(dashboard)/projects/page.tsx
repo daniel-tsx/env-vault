@@ -14,8 +14,11 @@ export default async function ProjectsPage({
 
   return (
     <div>
-      <div className="flex items-start justify-between mb-8">
+      <div className="ev-reveal flex items-start justify-between mb-8">
         <div>
+          <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            {"// projects"}
+          </p>
           <h1 className="text-3xl font-bold mb-2">Projects</h1>
           <p className="text-muted-foreground">
             Manage your projects and their environment variables.
@@ -24,7 +27,7 @@ export default async function ProjectsPage({
         <CreateProjectDialog />
       </div>
 
-      <div className="mb-8">
+      <div className="ev-reveal mb-8" style={{ animationDelay: "60ms" }}>
         <form className="relative max-w-md">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
           <Input
@@ -36,7 +39,9 @@ export default async function ProjectsPage({
         </form>
       </div>
 
-      <ProjectList projects={projects} />
+      <div className="ev-reveal" style={{ animationDelay: "120ms" }}>
+        <ProjectList projects={projects} />
+      </div>
     </div>
   );
 }
