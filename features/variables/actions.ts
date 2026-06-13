@@ -7,6 +7,11 @@ import { logAudit } from "@/lib/audit";
 import { encrypt, decrypt } from "@/lib/crypto";
 import { mapDbError } from "@/lib/db/errors";
 import {
+  checkRateLimit,
+  REVEAL_LIMIT,
+  REVEAL_WINDOW_SECONDS,
+} from "@/lib/rate-limit";
+import {
   verifyEnvironmentOwnership,
   verifyProjectOwnership,
   verifyVariableOwnership,
@@ -70,6 +75,18 @@ export async function getVariablesForProject(projectId: string) {
 
 export async function revealVariable(id: string) {
   const session = await requireSession();
+
+  const limit = await checkRateLimit(
+    `reveal:${session.user.id}`,
+    REVEAL_LIMIT,
+    REVEAL_WINDOW_SECONDS
+  );
+  if (!limit.allowed) {
+    throw new Error(
+      `Too many reveal requests. Please try again in ${limit.retryAfterSeconds}s.`
+    );
+  }
+
   const variable = await verifyVariableOwnership(id, session.user.id);
 
   const decryptedValue = decrypt(variable.environment_variables.encryptedValue);

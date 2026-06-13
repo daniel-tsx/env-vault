@@ -3,6 +3,8 @@ import {
   text,
   timestamp,
   boolean,
+  integer,
+  bigint,
   uniqueIndex,
   index,
 } from "drizzle-orm/pg-core";
@@ -143,3 +145,20 @@ export const auditLog = pgTable(
     index("audit_log_user_created_idx").on(table.userId, table.createdAt),
   ]
 );
+
+// BetterAuth's built-in rate limiting (database storage). Field names (id, key,
+// count, lastRequest) must match BetterAuth's "rateLimit" model.
+export const rateLimit = pgTable("rate_limit", {
+  id: text("id").primaryKey(),
+  key: text("key"),
+  count: integer("count"),
+  lastRequest: bigint("last_request", { mode: "number" }),
+});
+
+// Application-level fixed-window limiter for sensitive server actions
+// (e.g. revealing/exporting secrets), which don't go through BetterAuth.
+export const appRateLimit = pgTable("app_rate_limit", {
+  key: text("key").primaryKey(),
+  count: integer("count").notNull().default(0),
+  windowStart: timestamp("window_start").notNull().defaultNow(),
+});
