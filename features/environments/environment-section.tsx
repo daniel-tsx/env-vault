@@ -54,8 +54,8 @@ export function EnvironmentSection({
   }
 
   return (
-    <Card className="overflow-hidden">
-      <CardHeader className="pb-4 bg-muted/30 border-b border-border/50">
+    <Card className="overflow-hidden rounded-2xl border-border/60">
+      <CardHeader className="pb-4 bg-muted/30 border-b border-border/60">
         <div className="flex items-center justify-between">
           <button
             onClick={() => setCollapsed(!collapsed)}
@@ -117,7 +117,7 @@ export function EnvironmentSection({
       {!collapsed && (
         <CardContent className="pt-6">
           <VariableList variables={variables} />
-          <div className="mt-6 pt-6 border-t border-border/50 space-y-3">
+          <div className="mt-6 pt-6 border-t border-border/60 space-y-3">
             <AddVariableForm environmentId={environment.id} />
             <div className="flex flex-wrap gap-2">
               <ImportEnvDialog environmentId={environment.id} />
