@@ -1,5 +1,9 @@
 # EnvVault - Project Summary
 
+> **Status: historical.** A point-in-time summary of the initial build. The
+> current feature set and security model live in [`../README.md`](../README.md)
+> and [`SECURITY.md`](SECURITY.md).
+
 ## What Was Built
 
 A production-ready environment variable manager for developers, featuring:

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Folder, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import type { InferSelectModel } from "drizzle-orm";
 import type { projects } from "@/db/schema";
 

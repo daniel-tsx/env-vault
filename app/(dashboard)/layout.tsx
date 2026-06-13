@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Lock, LogOut } from "lucide-react";
+import { Lock, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/features/auth/actions";
+import { GlobalSearch } from "@/features/search/global-search";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -44,6 +46,9 @@ export default async function DashboardLayout({
             </div>
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </Link>
+          <div className="flex items-center gap-3">
+          <GlobalSearch />
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger
               render={<Button variant="ghost" className="relative size-10 rounded-full" />}
@@ -66,6 +71,11 @@ export default async function DashboardLayout({
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
+              <DropdownMenuItem render={<Link href="/settings" />}>
+                <Settings className="size-4 mr-2" />
+                Settings
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <form action={signOut} className="w-full">
                   <button type="submit" className="w-full flex items-center">
@@ -76,6 +86,7 @@ export default async function DashboardLayout({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
       </header>
       <main className="flex-1 max-w-7xl mx-auto w-full px-6 lg:px-8 py-8">

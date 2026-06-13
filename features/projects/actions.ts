@@ -3,114 +3,113 @@
 import { db } from "@/db";
 import { projects } from "@/db/schema";
 import { requireSession } from "@/lib/auth/session";
-import { createProjectSchema, updateProjectSchema } from "@/lib/validators/project";
-import { eq, and, like } from "drizzle-orm";
+import { logAudit } from "@/lib/audit";
+import { mapDbError } from "@/lib/db/errors";
+import { verifyProjectOwnership } from "@/lib/ownership";
+import {
+  createProjectSchema,
+  updateProjectSchema,
+} from "@/lib/validators/project";
+import { escapeLike } from "@/lib/sql";
+import { and, eq, ilike } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { revalidatePath } from "next/cache";
-import type { CreateProjectInput, UpdateProjectInput } from "@/lib/validators/project";
+import type {
+  CreateProjectInput,
+  UpdateProjectInput,
+} from "@/lib/validators/project";
 
 export async function getProjects(search?: string) {
   const session = await requireSession();
 
-  let query = db
-    .select()
-    .from(projects)
-    .where(eq(projects.userId, session.user.id))
-    .orderBy(projects.createdAt);
-
+  const conditions = [eq(projects.userId, session.user.id)];
   if (search) {
-    const escapedSearch = search.replace(/[%_]/g, "\\$&");
-    query = db
-      .select()
-      .from(projects)
-      .where(
-        and(
-          eq(projects.userId, session.user.id),
-          like(projects.name, `%${escapedSearch}%`)
-        )
-      )
-      .orderBy(projects.createdAt);
+    conditions.push(ilike(projects.name, `%${escapeLike(search)}%`));
   }
 
-  return await query;
+  return db
+    .select()
+    .from(projects)
+    .where(and(...conditions))
+    .orderBy(projects.createdAt);
 }
 
 export async function getProject(id: string) {
   const session = await requireSession();
-
-  const [project] = await db
-    .select()
-    .from(projects)
-    .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)))
-    .limit(1);
-
-  if (!project) {
-    throw new Error("Project not found");
-  }
-
-  return project;
+  return verifyProjectOwnership(id, session.user.id);
 }
 
 export async function createProject(input: CreateProjectInput) {
   const session = await requireSession();
   const validated = createProjectSchema.parse(input);
 
-  const [project] = await db
-    .insert(projects)
-    .values({
-      id: nanoid(),
-      userId: session.user.id,
-      name: validated.name,
-      description: validated.description || null,
-    })
-    .returning();
+  let inserted;
+  try {
+    inserted = await db
+      .insert(projects)
+      .values({
+        id: nanoid(),
+        userId: session.user.id,
+        name: validated.name,
+        description: validated.description || null,
+      })
+      .returning();
+  } catch (error) {
+    throw mapDbError(error);
+  }
 
   revalidatePath("/projects");
-  return project;
+  await logAudit({
+    userId: session.user.id,
+    action: "project.create",
+    resourceType: "project",
+    resourceId: inserted[0].id,
+    label: validated.name,
+  });
+  return inserted[0];
 }
 
 export async function updateProject(id: string, input: UpdateProjectInput) {
   const session = await requireSession();
+  await verifyProjectOwnership(id, session.user.id);
+
   const validated = updateProjectSchema.parse(input);
 
-  const [existing] = await db
-    .select()
-    .from(projects)
-    .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)))
-    .limit(1);
-
-  if (!existing) {
-    throw new Error("Project not found");
+  let updated;
+  try {
+    updated = await db
+      .update(projects)
+      .set({ ...validated, updatedAt: new Date() })
+      .where(eq(projects.id, id))
+      .returning();
+  } catch (error) {
+    throw mapDbError(error);
   }
-
-  const [updated] = await db
-    .update(projects)
-    .set({
-      ...validated,
-      updatedAt: new Date(),
-    })
-    .where(eq(projects.id, id))
-    .returning();
 
   revalidatePath(`/projects/${id}`);
   revalidatePath("/projects");
-  return updated;
+  await logAudit({
+    userId: session.user.id,
+    action: "project.update",
+    resourceType: "project",
+    resourceId: id,
+    label: updated[0].name,
+  });
+  return updated[0];
 }
 
 export async function deleteProject(id: string) {
   const session = await requireSession();
-
-  const [existing] = await db
-    .select()
-    .from(projects)
-    .where(and(eq(projects.id, id), eq(projects.userId, session.user.id)))
-    .limit(1);
-
-  if (!existing) {
-    throw new Error("Project not found");
-  }
+  const project = await verifyProjectOwnership(id, session.user.id);
 
   await db.delete(projects).where(eq(projects.id, id));
 
   revalidatePath("/projects");
+  await logAudit({
+    userId: session.user.id,
+    action: "project.delete",
+    resourceType: "project",
+    resourceId: id,
+    label: project.name,
+  });
 }

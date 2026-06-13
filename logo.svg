@@ -1,50 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <defs>
-    <linearGradient id="vaultGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#00D4FF;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#0099CC;stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  
-  <!-- Background circle (optional, can be removed for transparent) -->
-  <circle cx="256" cy="256" r="240" fill="#0A0E1A" opacity="0.95"/>
-  
-  <!-- Left bracket { -->
-  <path d="M 140 120 
-           Q 100 120 100 160 
-           L 100 220 
-           Q 100 240 80 256 
-           Q 100 272 100 292 
-           L 100 352 
-           Q 100 392 140 392" 
-        fill="none" 
-        stroke="url(#vaultGradient)" 
-        stroke-width="32" 
-        stroke-linecap="round" 
-        stroke-linejoin="round"/>
-  
-  <!-- Right bracket } -->
-  <path d="M 372 120 
-           Q 412 120 412 160 
-           L 412 220 
-           Q 412 240 432 256 
-           Q 412 272 412 292 
-           L 412 352 
-           Q 412 392 372 392" 
-        fill="none" 
-        stroke="url(#vaultGradient)" 
-        stroke-width="32" 
-        stroke-linecap="round" 
-        stroke-linejoin="round"/>
-  
-  <!-- Vault door / lock in center -->
-  <rect x="200" y="200" width="112" height="112" rx="16" fill="url(#vaultGradient)"/>
-  
-  <!-- Keyhole -->
-  <circle cx="256" cy="240" r="16" fill="#0A0E1A"/>
-  <rect x="248" y="248" width="16" height="32" rx="4" fill="#0A0E1A"/>
-  
-  <!-- Vault handle dots -->
-  <circle cx="224" cy="280" r="6" fill="#0A0E1A"/>
-  <circle cx="288" cy="280" r="6" fill="#0A0E1A"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512" role="img" aria-label="EnvVault">
+  <!-- Brand tile: deep azure, solid (no gradient), works on light or dark tabs -->
+  <rect width="512" height="512" rx="116" fill="#0D6FD1"/>
+
+  <!-- Config braces { } — the "Env" -->
+  <g fill="none" stroke="#ffffff" stroke-width="34" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M170 170 Q140 170 140 200 L140 238 Q140 256 118 256 Q140 256 140 274 L140 312 Q140 342 170 342"/>
+    <path d="M342 170 Q372 170 372 200 L372 238 Q372 256 394 256 Q372 256 372 274 L372 312 Q372 342 342 342"/>
+  </g>
+
+  <!-- Keyhole — the "Vault" -->
+  <g fill="#ffffff">
+    <circle cx="256" cy="226" r="42"/>
+    <path d="M243 256 L269 256 L286 332 Q288 340 279 340 L233 340 Q224 340 226 332 Z"/>
+  </g>
 </svg>

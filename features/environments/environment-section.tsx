@@ -4,6 +4,9 @@ import { useState } from "react";
 import { deleteEnvironment } from "@/features/environments/actions";
 import { VariableList } from "@/features/variables/variable-list";
 import { AddVariableForm } from "@/features/variables/add-variable-form";
+import { ImportEnvDialog } from "@/features/variables/import-env-dialog";
+import { ExportEnvButton } from "@/features/variables/export-env-button";
+import { EditEnvironmentDialog } from "@/features/environments/edit-environment-dialog";
 import { Trash2, Loader2, ChevronDown, ChevronRight, Server } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -32,11 +35,9 @@ type Variable = Pick<
 export function EnvironmentSection({
   environment,
   variables,
-  projectId,
 }: {
   environment: Environment;
   variables: Variable[];
-  projectId: string;
 }) {
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
@@ -73,6 +74,8 @@ export function EnvironmentSection({
               {variables.length} variable{variables.length !== 1 ? "s" : ""}
             </Badge>
           </button>
+          <div className="flex items-center gap-1">
+          <EditEnvironmentDialog environment={environment} />
           <AlertDialog>
             <AlertDialogTrigger
               render={
@@ -107,14 +110,19 @@ export function EnvironmentSection({
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </div>
       </CardHeader>
 
       {!collapsed && (
         <CardContent className="pt-6">
           <VariableList variables={variables} />
-          <div className="mt-6 pt-6 border-t border-border/50">
+          <div className="mt-6 pt-6 border-t border-border/50 space-y-3">
             <AddVariableForm environmentId={environment.id} />
+            <div className="flex flex-wrap gap-2">
+              <ImportEnvDialog environmentId={environment.id} />
+              <ExportEnvButton environmentId={environment.id} />
+            </div>
           </div>
         </CardContent>
       )}

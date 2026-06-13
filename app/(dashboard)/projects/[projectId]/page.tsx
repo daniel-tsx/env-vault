@@ -1,9 +1,10 @@
 import { getProject } from "@/features/projects/actions";
 import { getEnvironments } from "@/features/environments/actions";
-import { getVariables } from "@/features/variables/actions";
+import { getVariablesForProject } from "@/features/variables/actions";
 import { CreateEnvironmentDialog } from "@/features/environments/create-environment-dialog";
 import { EnvironmentSection } from "@/features/environments/environment-section";
 import { DeleteProjectButton } from "@/features/projects/delete-project-button";
+import { EditProjectDialog } from "@/features/projects/edit-project-dialog";
 import { ArrowLeft, Folder } from "lucide-react";
 import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,14 +17,15 @@ export default async function ProjectDetailPage({
 }) {
   const { projectId } = await params;
   const project = await getProject(projectId);
-  const environments = await getEnvironments(projectId);
+  const [environments, allVariables] = await Promise.all([
+    getEnvironments(projectId),
+    getVariablesForProject(projectId),
+  ]);
 
-  const variablesByEnvironment = await Promise.all(
-    environments.map(async (env) => ({
-      environment: env,
-      variables: await getVariables(env.id),
-    }))
-  );
+  const variablesByEnvironment = environments.map((environment) => ({
+    environment,
+    variables: allVariables.filter((v) => v.environmentId === environment.id),
+  }));
 
   return (
     <div>
@@ -47,7 +49,10 @@ export default async function ProjectDetailPage({
             )}
           </div>
         </div>
-        <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        <div className="flex items-center gap-1">
+          <EditProjectDialog project={project} />
+          <DeleteProjectButton projectId={project.id} projectName={project.name} />
+        </div>
       </div>
 
       <Separator className="mb-8" />
@@ -76,7 +81,6 @@ export default async function ProjectDetailPage({
               key={environment.id}
               environment={environment}
               variables={variables}
-              projectId={projectId}
             />
           ))}
         </div>

@@ -4,202 +4,134 @@ A secure environment variable manager for developers who work on multiple projec
 
 ## Features
 
-- **Multi-project support**: Organize variables across all your projects
-- **AES-256-GCM encryption**: All secrets are encrypted at rest
-- **Environment groups**: Separate development, staging, and production variables
-- **Secure by default**: Values are masked in the UI, revealed only on demand
-- **Fast search**: Find any variable instantly
-- **One-click copy**: Copy values securely after reveal
+- **Multi-project support** — organize variables across all your projects
+- **AES-256-GCM encryption** with **zero-downtime key rotation**
+- **Environment groups** — separate development, staging, and production
+- **Secure by default** — values masked in the UI, revealed only on demand
+- **Step-up re-authentication** before revealing, copying, or exporting secrets
+- **Two-factor authentication** (TOTP + backup codes)
+- **Rate limiting** on reveal/export and auth endpoints
+- **Audit log** of secret access and changes
+- **Variable history** with reveal and restore
+- **Bulk `.env` import/export**
+- **Global search** across all projects (`Cmd/Ctrl+K`)
+- **Account settings** — profile, password, 2FA, recent activity, delete account
+- **Light & dark themes**
 
 ## Tech Stack
 
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- Drizzle ORM
-- Neon Postgres
-- BetterAuth
-- Zod
+- Next.js 16 (App Router) · React 19 · TypeScript
+- Tailwind CSS v4 · shadcn/ui on Base UI · next-themes
+- Drizzle ORM · Neon Postgres
+- BetterAuth (email/password + two-factor) · Zod
+- Vitest (unit tests for crypto, rate limiting, step-up, `.env` parsing)
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- pnpm (recommended) or npm
-- A Neon Postgres database (free tier available at [neon.tech](https://neon.tech))
+- pnpm (recommended)
+- A Neon Postgres database ([neon.tech](https://neon.tech))
 
 ### Installation
 
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd env-vault
-```
-
-2. Install dependencies:
-```bash
-pnpm install
-```
-
-3. Create a `.env.local` file based on `.env.example`:
-```bash
-cp .env.example .env.local
-```
-
-4. Configure your environment variables:
-
-```env
-# Database - Get from neon.tech
-DATABASE_URL=postgresql://...
-
-# Generate with: openssl rand -hex 32
-BETTER_AUTH_SECRET=your-secret-here
-BETTER_AUTH_URL=http://localhost:3000
-
-# Generate with: openssl rand -hex 32
-ENCRYPTION_KEY=your-encryption-key-here
-```
-
-**Generating secure keys:**
-
-```bash
-# On macOS/Linux
-openssl rand -hex 32
-
-# On Windows (PowerShell)
--join ((1..32) | ForEach-Object { '{0:x2}' -f (Get-Random -Max 256) })
-
-# Or use an online generator (use at your own risk)
-```
-
-5. Push the database schema:
-```bash
-pnpm db:push
-```
-
-6. Run the development server:
-```bash
-pnpm dev
-```
-
-7. Open [http://localhost:3000](http://localhost:3000) in your browser.
+1. Install dependencies:
+   ```bash
+   pnpm install
+   ```
+2. Create `.env.local` from the example and fill it in:
+   ```bash
+   cp .env.example .env.local
+   ```
+   ```env
+   DATABASE_URL=postgresql://...
+   BETTER_AUTH_SECRET=...      # openssl rand -hex 32
+   BETTER_AUTH_URL=http://localhost:3000
+   ENCRYPTION_KEY=...          # openssl rand -hex 32 (32 bytes), used as key id "0"
+   ```
+3. Apply the database schema:
+   ```bash
+   pnpm db:migrate   # or `pnpm db:push` for quick dev iteration
+   ```
+4. Run the dev server:
+   ```bash
+   pnpm dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000).
 
 ## Project Structure
 
 ```
 env-vault/
-├── app/                          # Next.js App Router pages
-│   ├── (auth)/                   # Auth pages (sign-in, sign-up)
-│   ├── (dashboard)/              # Protected dashboard pages
-│   │   └── projects/
-│   ├── api/auth/                 # BetterAuth API routes
-│   └── layout.tsx
-├── components/                   # Shared UI components
+├── app/
+│   ├── (dashboard)/            # Protected: projects, settings (+ loading/error)
+│   ├── sign-in, sign-up, two-factor
+│   ├── api/auth/[...all]
+│   └── layout.tsx, page.tsx, globals.css
+├── components/                 # ThemeProvider, ThemeToggle, ui/* (shadcn/Base UI)
 ├── db/
-│   ├── schema.ts                 # Drizzle schema definitions
-│   └── index.ts                  # Database client
-├── features/
-│   ├── projects/                 # Project-related actions & components
-│   ├── environments/             # Environment-related actions & components
-│   └── variables/                # Variable-related actions & components
+│   ├── schema.ts               # Drizzle schema
+│   └── migrations/             # Generated SQL migrations
+├── features/                   # auth, account, projects, environments, variables, search
 ├── lib/
-│   ├── auth/                     # BetterAuth configuration
-│   ├── crypto/                   # Encryption/decryption utilities
-│   ├── validators/               # Zod validation schemas
-│   └── utils.ts                  # Utility functions
-└── middleware.ts                 # Route protection middleware
+│   ├── auth/                   # BetterAuth config, session, client, password verify
+│   ├── crypto/                 # AES-256-GCM with key versioning (+ tests)
+│   ├── audit.ts, rate-limit.ts, step-up.ts, ownership.ts, env-file.ts, sql.ts
+│   └── db/errors.ts            # safe DB error mapping
+├── scripts/rotate-keys.ts      # re-encrypt all values to the primary key
+└── proxy.ts                    # auth redirect (Next 16 proxy convention)
 ```
 
 ## Security
 
-### Encryption
+See [`docs/SECURITY.md`](docs/SECURITY.md) for the full model. Highlights:
 
-All environment variable values are encrypted using **AES-256-GCM** before being stored in the database:
+- **Not zero-knowledge:** values are encrypted at rest with a server-held key
+  (required for reveal/export/CLI). Integrity is guaranteed by GCM auth tags.
+- **Key rotation:** ciphertext is `keyId:iv:authTag:ciphertext`; add a new key to
+  `ENCRYPTION_KEYS`, set `ENCRYPTION_PRIMARY_KEY_ID`, then run
+  `pnpm rotate-keys --apply`. Legacy un-versioned values keep decrypting.
+- **Access control:** every action re-verifies session and ownership; DB errors
+  are mapped to safe messages.
+- **Reveal protection:** step-up re-auth + rate limiting + 30s auto-hide.
+- **2FA:** optional TOTP with backup codes, challenged at sign-in.
+- **Audit log:** every reveal/export/mutation recorded (never the values).
 
-- **Algorithm**: AES-256-GCM (authenticated encryption)
-- **Key**: 32-byte key from `ENCRYPTION_KEY` environment variable
-- **IV**: Random 12-byte initialization vector per value
-- **Auth Tag**: 16-byte authentication tag for integrity verification
-- **Storage format**: `iv:authTag:ciphertext` (all hex-encoded)
-
-### Secret Reveal Flow
-
-1. User clicks "Reveal" button
-2. Server action verifies session and ownership
-3. Value is decrypted server-side
-4. Decrypted value is sent to client
-5. Value is displayed temporarily and can be hidden again
-
-### Ownership Enforcement
-
-Every server action and query follows this pattern:
-1. Verify user session
-2. Load resource
-3. Verify resource belongs to user
-4. Proceed with operation
-
-This ensures users can only access their own projects, environments, and variables.
-
-## Database Commands
+## Commands
 
 ```bash
-# Generate migrations (not used with db:push, but available)
-pnpm db:generate
-
-# Push schema changes to database
-pnpm db:push
-
-# Open Drizzle Studio (database GUI)
-pnpm db:studio
+pnpm dev | build | start
+pnpm lint | typecheck | test
+pnpm db:generate   # generate a migration from schema changes
+pnpm db:migrate    # apply migrations
+pnpm db:push       # push schema directly (dev)
+pnpm db:studio     # Drizzle Studio
+pnpm rotate-keys [--apply]   # re-encrypt values to the primary key
 ```
 
 ## Deployment
 
-### Environment Variables
-
-Make sure to set all required environment variables in your deployment platform:
-
-- `DATABASE_URL`
-- `BETTER_AUTH_SECRET`
-- `BETTER_AUTH_URL` (your production URL)
-- `ENCRYPTION_KEY`
-
-### Vercel
-
-1. Push your code to GitHub
-2. Import project in Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy
-
-### Other Platforms
-
-Follow your platform's deployment guide for Next.js apps. Ensure all environment variables are configured.
+Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL` (HTTPS),
+`ENCRYPTION_KEY` (and, if rotating, `ENCRYPTION_KEYS` / `ENCRYPTION_PRIMARY_KEY_ID`)
+in your platform. Apply migrations on deploy. For Vercel: import the repo, add
+the env vars, deploy.
 
 ## Security Best Practices
 
-1. **Never commit `.env.local`** - it's already in `.gitignore`
-2. **Use strong, unique keys** for `BETTER_AUTH_SECRET` and `ENCRYPTION_KEY`
-3. **Rotate encryption keys** periodically (requires re-encrypting all values)
-4. **Use HTTPS in production** - set `BETTER_AUTH_URL` to your HTTPS URL
-5. **Review access logs** - monitor for unauthorized access attempts
-6. **Backup your database** - encrypted data is only as safe as your backups
+1. Never commit `.env.local` (already git-ignored).
+2. Use strong, unique `BETTER_AUTH_SECRET` and `ENCRYPTION_KEY`.
+3. Rotate the encryption key periodically (`pnpm rotate-keys`).
+4. Use HTTPS in production.
+5. Review recent activity (Settings) and back up your database.
 
 ## Future Enhancements
 
-- [ ] Team/workspace support
-- [ ] Variable sharing between team members
-- [ ] Audit logs for all actions
-- [ ] Bulk import/export (encrypted)
-- [ ] CLI tool for syncing variables
+- [ ] Team/workspace support with RBAC
+- [ ] CLI tool for syncing variables in CI/CD
 - [ ] API access with scoped tokens
-- [ ] Variable versioning/history
-- [ ] Integration with CI/CD platforms
+- [ ] Webhook notifications for secret access
 
 ## License
 
 MIT
-
-## Contributing
-
-Contributions are welcome! Please open an issue or submit a pull request.

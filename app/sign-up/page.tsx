@@ -43,10 +43,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center px-6 py-12 relative">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/5 via-background to-background pointer-events-none" />
-      
-      <Card className="w-full max-w-md relative shadow-2xl shadow-primary/5">
+    <div className="flex flex-1 items-center justify-center px-6 py-12">
+      <Card className="w-full max-w-md shadow-2xl shadow-primary/5">
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2.5 mb-2">
             <div className="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
