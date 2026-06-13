@@ -63,3 +63,7 @@ export async function issueRevealGrant(sessionId: string): Promise<void> {
     maxAge: STEP_UP_TTL_SECONDS,
   });
 }
+
+export async function clearRevealGrant(): Promise<void> {
+  (await cookies()).delete(COOKIE_NAME);
+}

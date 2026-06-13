@@ -10,9 +10,10 @@ import {
   STEP_UP_LIMIT,
   STEP_UP_WINDOW_SECONDS,
 } from "@/lib/rate-limit";
-import { issueRevealGrant } from "@/lib/step-up";
+import { clearRevealGrant, issueRevealGrant } from "@/lib/step-up";
 
 export async function signOut() {
+  await clearRevealGrant();
   await auth.api.signOut({
     headers: await headers(),
   });
