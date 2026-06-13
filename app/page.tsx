@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { DotGrid } from "@/components/dot-grid";
 
 export default function LandingPage() {
   return (
@@ -436,23 +437,3 @@ function Kbd({ children }: { children: ReactNode }) {
   );
 }
 
-function DotGrid() {
-  return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 -z-10 size-full text-foreground/[0.07] [mask-image:radial-gradient(ellipse_70%_60%_at_50%_0%,black,transparent_75%)]"
-    >
-      <defs>
-        <pattern
-          id="ev-dots"
-          width="24"
-          height="24"
-          patternUnits="userSpaceOnUse"
-        >
-          <circle cx="1.5" cy="1.5" r="1.5" fill="currentColor" />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#ev-dots)" />
-    </svg>
-  );
-}

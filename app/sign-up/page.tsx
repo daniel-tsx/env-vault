@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { DotGrid } from "@/components/dot-grid";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,13 +45,17 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center px-6 py-12">
-      <Card className="w-full max-w-md shadow-2xl shadow-primary/5">
+    <div className="relative flex flex-1 items-center justify-center overflow-hidden px-6 py-12">
+      <DotGrid fade="center" />
+      <Card className="ev-reveal w-full max-w-md rounded-2xl border-border/60 shadow-2xl shadow-primary/5">
         <CardHeader className="space-y-3 pb-6">
           <div className="flex items-center gap-2.5 mb-2">
             <Logo className="size-10" />
             <span className="text-2xl font-bold tracking-tight">EnvVault</span>
           </div>
+          <p className="font-mono text-xs uppercase tracking-[0.2em] text-primary">
+            {"// create account"}
+          </p>
           <CardTitle className="text-3xl">Create your vault</CardTitle>
           <CardDescription className="text-base">
             Start securing your environment variables in minutes.
