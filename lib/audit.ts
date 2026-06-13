@@ -16,6 +16,7 @@ export type AuditAction =
   | "variable.update"
   | "variable.delete"
   | "variable.reveal"
+  | "variable.import"
   | "variable.export";
 
 type LogAuditInput = {

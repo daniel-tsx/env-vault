@@ -10,8 +10,11 @@ import {
   checkRateLimit,
   REVEAL_LIMIT,
   REVEAL_WINDOW_SECONDS,
+  EXPORT_LIMIT,
+  EXPORT_WINDOW_SECONDS,
 } from "@/lib/rate-limit";
 import { hasValidRevealGrant } from "@/lib/step-up";
+import { parseEnv, serializeEnv } from "@/lib/env-file";
 import {
   verifyEnvironmentOwnership,
   verifyProjectOwnership,
@@ -207,4 +210,141 @@ export async function deleteVariable(id: string) {
     resourceId: id,
     label: existing.environment_variables.key,
   });
+}
+
+const KEY_PATTERN = /^[A-Z0-9_]+$/;
+
+export type ImportResult = {
+  created: number;
+  updated: number;
+  skipped: number;
+  invalid: string[];
+};
+
+export async function importVariables(
+  environmentId: string,
+  content: string,
+  mode: "skip" | "overwrite"
+): Promise<ImportResult> {
+  const session = await requireSession();
+  const environment = await verifyEnvironmentOwnership(
+    environmentId,
+    session.user.id
+  );
+
+  const entries = parseEnv(content);
+
+  const existingRows = await db
+    .select({ id: environmentVariables.id, key: environmentVariables.key })
+    .from(environmentVariables)
+    .where(eq(environmentVariables.environmentId, environmentId));
+  const existingByKey = new Map(existingRows.map((row) => [row.key, row.id]));
+
+  const toInsert: (typeof environmentVariables.$inferInsert)[] = [];
+  const invalid: string[] = [];
+  let updated = 0;
+  let skipped = 0;
+
+  for (const entry of entries) {
+    if (!KEY_PATTERN.test(entry.key)) {
+      invalid.push(entry.key);
+      continue;
+    }
+    const existingId = existingByKey.get(entry.key);
+    if (existingId) {
+      if (mode === "skip") {
+        skipped++;
+        continue;
+      }
+      await db
+        .update(environmentVariables)
+        .set({ encryptedValue: encrypt(entry.value), updatedAt: new Date() })
+        .where(eq(environmentVariables.id, existingId));
+      updated++;
+    } else {
+      toInsert.push({
+        id: nanoid(),
+        projectId: environment.projects.id,
+        environmentId,
+        key: entry.key,
+        encryptedValue: encrypt(entry.value),
+        description: null,
+      });
+    }
+  }
+
+  if (toInsert.length > 0) {
+    try {
+      await db.insert(environmentVariables).values(toInsert);
+    } catch (error) {
+      throw mapDbError(error);
+    }
+  }
+
+  revalidatePath(`/projects/${environment.projects.id}`);
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.import",
+    resourceType: "environment",
+    resourceId: environmentId,
+    label: `${toInsert.length} created, ${updated} updated`,
+  });
+
+  return { created: toInsert.length, updated, skipped, invalid };
+}
+
+export type ExportResult =
+  | { status: "ok"; filename: string; content: string }
+  | { status: "step_up_required" }
+  | { status: "rate_limited"; retryAfterSeconds: number };
+
+export async function exportEnvironment(
+  environmentId: string
+): Promise<ExportResult> {
+  const session = await requireSession();
+
+  if (!(await hasValidRevealGrant(session.session.id))) {
+    return { status: "step_up_required" };
+  }
+
+  const limit = await checkRateLimit(
+    `export:${session.user.id}`,
+    EXPORT_LIMIT,
+    EXPORT_WINDOW_SECONDS
+  );
+  if (!limit.allowed) {
+    return { status: "rate_limited", retryAfterSeconds: limit.retryAfterSeconds };
+  }
+
+  const environment = await verifyEnvironmentOwnership(
+    environmentId,
+    session.user.id
+  );
+
+  const rows = await db
+    .select({
+      key: environmentVariables.key,
+      encryptedValue: environmentVariables.encryptedValue,
+    })
+    .from(environmentVariables)
+    .where(eq(environmentVariables.environmentId, environmentId))
+    .orderBy(environmentVariables.key);
+
+  const content = serializeEnv(
+    rows.map((row) => ({ key: row.key, value: decrypt(row.encryptedValue) }))
+  );
+
+  await logAudit({
+    userId: session.user.id,
+    action: "variable.export",
+    resourceType: "environment",
+    resourceId: environmentId,
+    label: environment.environments.name,
+  });
+
+  return {
+    status: "ok",
+    filename: `${environment.environments.slug || "environment"}.env`,
+    content,
+  };
 }
