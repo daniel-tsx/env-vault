@@ -1,12 +1,11 @@
 import Link from "next/link";
 import { Lock, FolderKey, Search, Copy, Shield, Zap, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function LandingPage() {
   return (
-    <div className="flex flex-col min-h-screen relative overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background pointer-events-none" />
-      
+    <div className="flex flex-col min-h-screen">
       <header className="border-b border-border/50 backdrop-blur-sm sticky top-0 z-50 bg-background/80">
         <div className="max-w-7xl mx-auto px-6 lg:px-8 py-5 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
@@ -15,8 +14,9 @@ export default function LandingPage() {
             </div>
             <span className="text-xl font-bold tracking-tight">EnvVault</span>
           </div>
-          <nav className="flex items-center gap-3">
-            <Link 
+          <nav className="flex items-center gap-2">
+            <ThemeToggle />
+            <Link
               href="/sign-in"
               className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-4 py-2"
             >
@@ -43,9 +43,7 @@ export default function LandingPage() {
             <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.1]">
               Your secrets,
               <br />
-              <span className="bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent">
-                securely managed.
-              </span>
+              <span className="text-primary">securely managed.</span>
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto mb-12 leading-relaxed">

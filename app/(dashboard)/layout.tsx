@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { signOut } from "@/features/auth/actions";
 import { GlobalSearch } from "@/features/search/global-search";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default async function DashboardLayout({
   children,
@@ -47,6 +48,7 @@ export default async function DashboardLayout({
           </Link>
           <div className="flex items-center gap-3">
           <GlobalSearch />
+          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger
               render={<Button variant="ghost" className="relative size-10 rounded-full" />}
