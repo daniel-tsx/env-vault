@@ -105,7 +105,7 @@ export function DeleteProjectButton({
             disabled={loading || confirmName !== projectName}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            {loading && <Loader2 className="size-4 animate-spin" />}
             Delete project
           </AlertDialogAction>
         </AlertDialogFooter>

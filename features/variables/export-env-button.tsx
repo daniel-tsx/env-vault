@@ -54,9 +54,9 @@ export function ExportEnvButton({ environmentId }: { environmentId: string }) {
         disabled={loading}
       >
         {loading ? (
-          <Loader2 className="size-4 mr-2 animate-spin" />
+          <Loader2 className="size-4 animate-spin" />
         ) : (
-          <Download className="size-4 mr-2" />
+          <Download className="size-4" />
         )}
         Export .env
       </Button>

@@ -105,9 +105,9 @@ export function TwoFactorSection({ enabled }: { enabled: boolean }) {
           )}
           <Button type="submit" variant="destructive" disabled={loading}>
             {loading ? (
-              <Loader2 className="size-4 animate-spin mr-2" />
+              <Loader2 className="size-4 animate-spin" />
             ) : (
-              <ShieldOff className="size-4 mr-2" />
+              <ShieldOff className="size-4" />
             )}
             Disable 2FA
           </Button>
@@ -168,7 +168,7 @@ export function TwoFactorSection({ enabled }: { enabled: boolean }) {
           )}
           <div className="flex gap-2">
             <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Verify & enable
             </Button>
             <Button
@@ -214,9 +214,9 @@ export function TwoFactorSection({ enabled }: { enabled: boolean }) {
         )}
         <Button type="submit" disabled={loading}>
           {loading ? (
-            <Loader2 className="size-4 animate-spin mr-2" />
+            <Loader2 className="size-4 animate-spin" />
           ) : (
-            <ShieldCheck className="size-4 mr-2" />
+            <ShieldCheck className="size-4" />
           )}
           Set up 2FA
         </Button>

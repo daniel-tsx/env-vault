@@ -269,7 +269,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 disabled={deleting}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleting && <Loader2 className="size-4 animate-spin mr-2" />}
+                {deleting && <Loader2 className="size-4 animate-spin" />}
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

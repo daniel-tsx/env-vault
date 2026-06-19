@@ -54,7 +54,7 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
         onClick={() => setOpen(true)}
         className="w-full"
       >
-        <Plus className="size-4 mr-2" />
+        <Plus className="size-4" />
         Add variable
       </Button>
     );
@@ -126,7 +126,7 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
           Cancel
         </Button>
         <Button type="submit" size="sm" disabled={loading}>
-          {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+          {loading && <Loader2 className="size-4 animate-spin" />}
           Add variable
         </Button>
       </div>

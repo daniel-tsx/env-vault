@@ -54,7 +54,7 @@ export function ProfileSection({
         <Input id="profile-email" value={email} disabled className="h-11" />
       </div>
       <Button type="submit" disabled={loading || name.trim() === ""}>
-        {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+        {loading && <Loader2 className="size-4 animate-spin" />}
         Save changes
       </Button>
     </form>

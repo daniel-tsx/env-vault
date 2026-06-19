@@ -82,7 +82,7 @@ export function EnvironmentSection({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="size-8 text-muted-foreground hover:text-destructive"
+                  className="text-muted-foreground hover:text-destructive"
                 />
               }
             >
@@ -104,7 +104,7 @@ export function EnvironmentSection({
                   disabled={deleting}
                   className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
                 >
-                  {deleting && <Loader2 className="size-4 animate-spin mr-2" />}
+                  {deleting && <Loader2 className="size-4 animate-spin" />}
                   Delete
                 </AlertDialogAction>
               </AlertDialogFooter>

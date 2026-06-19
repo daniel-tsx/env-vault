@@ -71,14 +71,14 @@ export default async function DashboardLayout({
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem render={<Link href="/settings" />}>
-                <Settings className="size-4 mr-2" />
+                <Settings className="size-4" />
                 Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem>
                 <form action={signOut} className="w-full">
-                  <button type="submit" className="w-full flex items-center">
-                    <LogOut className="size-4 mr-2" />
+                  <button type="submit" className="w-full flex items-center gap-1.5">
+                    <LogOut className="size-4" />
                     Sign out
                   </button>
                 </form>

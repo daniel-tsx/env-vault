@@ -117,7 +117,7 @@ export default function SignUpPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-6">
             <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Create account
             </Button>
             <p className="text-sm text-muted-foreground text-center">

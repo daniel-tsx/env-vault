@@ -95,7 +95,7 @@ export default function TwoFactorPage() {
               className="w-full h-11 text-base"
               disabled={loading}
             >
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Verify
             </Button>
             <button

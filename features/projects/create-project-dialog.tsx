@@ -48,7 +48,7 @@ export function CreateProjectDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger render={<Button />}>
-        <Plus className="size-4 mr-2" />
+        <Plus className="size-4" />
         New project
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -102,8 +102,8 @@ export function CreateProjectDialog() {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="h-11">
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Create project
             </Button>
           </DialogFooter>

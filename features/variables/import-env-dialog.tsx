@@ -78,7 +78,7 @@ export function ImportEnvDialog({ environmentId }: { environmentId: string }) {
       }}
     >
       <DialogTrigger render={<Button variant="outline" size="sm" />}>
-        <Upload className="size-4 mr-2" />
+        <Upload className="size-4" />
         Import .env
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
@@ -134,7 +134,7 @@ export function ImportEnvDialog({ environmentId }: { environmentId: string }) {
               Cancel
             </Button>
             <Button type="submit" disabled={loading || parsedCount === 0}>
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Import{parsedCount > 0 ? ` ${parsedCount}` : ""}
             </Button>
           </DialogFooter>

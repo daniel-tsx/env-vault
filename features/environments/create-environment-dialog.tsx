@@ -46,8 +46,8 @@ export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger render={<Button size="sm" />}>
-        <Plus className="size-4 mr-2" />
+      <DialogTrigger render={<Button />}>
+        <Plus className="size-4" />
         Add environment
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
@@ -88,8 +88,8 @@ export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="h-11">
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Create environment
             </Button>
           </DialogFooter>

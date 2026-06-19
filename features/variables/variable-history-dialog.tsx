@@ -197,7 +197,7 @@ export function VariableHistoryDialog({ variableId }: { variableId: string }) {
                         onClick={() => restore(version.id)}
                         disabled={busyId === version.id}
                       >
-                        <RotateCcw className="size-3.5 mr-1.5" />
+                        <RotateCcw className="size-3.5" />
                         Restore
                       </Button>
                     </div>

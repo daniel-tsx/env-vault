@@ -32,9 +32,9 @@ export default async function SettingsPage() {
       <div className="ev-reveal">
         <Link
           href="/projects"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-6"
         >
-          <ArrowLeft className="size-4 mr-2" />
+          <ArrowLeft className="size-4" />
           Back to projects
         </Link>
         <p className="mb-2 font-mono text-xs uppercase tracking-[0.2em] text-primary">

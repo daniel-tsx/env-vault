@@ -31,9 +31,9 @@ export default async function ProjectDetailPage({
     <div>
       <Link
         href="/projects"
-        className="ev-reveal inline-flex items-center justify-center rounded-lg text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground h-9 px-3 mb-6"
+        className="ev-reveal inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground mb-6"
       >
-        <ArrowLeft className="size-4 mr-2" />
+        <ArrowLeft className="size-4" />
         Back to projects
       </Link>
 

@@ -74,7 +74,7 @@ export function PasswordSection() {
         </Alert>
       )}
       <Button type="submit" disabled={loading}>
-        {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+        {loading && <Loader2 className="size-4 animate-spin" />}
         Change password
       </Button>
     </form>

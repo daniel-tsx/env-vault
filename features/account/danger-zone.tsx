@@ -41,7 +41,7 @@ export function DangerZone() {
   return (
     <AlertDialog>
       <AlertDialogTrigger render={<Button variant="destructive" />}>
-        <Trash2 className="size-4 mr-2" />
+        <Trash2 className="size-4" />
         Delete account
       </AlertDialogTrigger>
       <AlertDialogContent className="sm:max-w-md">
@@ -91,7 +91,7 @@ export function DangerZone() {
             disabled={loading || password === ""}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            {loading && <Loader2 className="size-4 animate-spin" />}
             Delete account
           </AlertDialogAction>
         </AlertDialogFooter>

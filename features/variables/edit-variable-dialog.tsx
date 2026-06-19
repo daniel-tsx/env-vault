@@ -162,8 +162,8 @@ export function EditVariableDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={loading} className="h-11">
-              {loading && <Loader2 className="size-4 animate-spin mr-2" />}
+            <Button type="submit" disabled={loading}>
+              {loading && <Loader2 className="size-4 animate-spin" />}
               Save changes
             </Button>
           </DialogFooter>
