@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateVariable } from "@/features/variables/actions";
 import { Pencil, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import type { UpdateVariableInput } from "@/lib/validators/variable";
 
 type EditableVariable = {
   id: string;
@@ -32,10 +31,13 @@ type EditableVariable = {
 
 export function EditVariableDialog({
   variable,
+  onSubmit,
+  disabled = false,
 }: {
   variable: EditableVariable;
+  onSubmit: (id: string, input: UpdateVariableInput) => Promise<void>;
+  disabled?: boolean;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState(variable.key);
   const [value, setValue] = useState("");
@@ -56,7 +58,7 @@ export function EditVariableDialog({
     setLoading(true);
 
     try {
-      await updateVariable(variable.id, {
+      await onSubmit(variable.id, {
         key: key.toUpperCase(),
         description,
         // Only re-encrypt the value when a new one is entered; leaving it blank
@@ -66,7 +68,6 @@ export function EditVariableDialog({
       setOpen(false);
       setValue("");
       toast.success("Variable updated");
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update variable");
     } finally {
@@ -86,7 +87,14 @@ export function EditVariableDialog({
         <TooltipTrigger
           render={
             <DialogTrigger
-              render={<Button variant="ghost" size="icon" className="size-9" />}
+              render={
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-9"
+                  disabled={disabled}
+                />
+              }
             />
           }
         >

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createProject } from "@/features/projects/actions";
 import { Plus, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,9 +16,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { CreateProjectInput } from "@/lib/validators/project";
 
-export function CreateProjectDialog() {
-  const router = useRouter();
+export function CreateProjectDialog({
+  onCreate,
+}: {
+  onCreate: (input: CreateProjectInput) => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -33,11 +35,10 @@ export function CreateProjectDialog() {
     setLoading(true);
 
     try {
-      const project = await createProject({ name, description });
+      await onCreate({ name, description });
       setOpen(false);
       setName("");
       setDescription("");
-      router.push(`/projects/${project.id}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create project");
     } finally {

@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateEnvironment } from "@/features/environments/actions";
 import { Pencil, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,13 +21,15 @@ import {
 } from "@/components/ui/tooltip";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import type { UpdateEnvironmentInput } from "@/lib/validators/environment";
 
 export function EditEnvironmentDialog({
   environment,
+  onRename,
 }: {
   environment: { id: string; name: string };
+  onRename: (input: UpdateEnvironmentInput) => Promise<void>;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(environment.name);
   const [error, setError] = useState("");
@@ -40,10 +40,9 @@ export function EditEnvironmentDialog({
     setError("");
     setLoading(true);
     try {
-      await updateEnvironment(environment.id, { name });
+      await onRename({ name });
       setOpen(false);
       toast.success("Environment updated");
-      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to update environment"

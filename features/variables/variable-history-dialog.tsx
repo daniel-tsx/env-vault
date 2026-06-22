@@ -28,7 +28,13 @@ import { toast } from "sonner";
 
 type Version = Awaited<ReturnType<typeof getVariableHistory>>[number];
 
-export function VariableHistoryDialog({ variableId }: { variableId: string }) {
+export function VariableHistoryDialog({
+  variableId,
+  disabled = false,
+}: {
+  variableId: string;
+  disabled?: boolean;
+}) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [versions, setVersions] = useState<Version[]>([]);
@@ -115,7 +121,12 @@ export function VariableHistoryDialog({ variableId }: { variableId: string }) {
             render={
               <DialogTrigger
                 render={
-                  <Button variant="ghost" size="icon" className="size-9" />
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-9"
+                    disabled={disabled}
+                  />
                 }
               />
             }

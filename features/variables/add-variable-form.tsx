@@ -1,17 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { createVariable } from "@/features/variables/actions";
+import { useRef, useState } from "react";
 import { Plus, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
+import type { CreateVariableInput } from "@/lib/validators/variable";
 
-export function AddVariableForm({ environmentId }: { environmentId: string }) {
-  const router = useRouter();
+type AddVariableInput = Omit<CreateVariableInput, "environmentId">;
+
+export function AddVariableForm({
+  onAdd,
+}: {
+  onAdd: (input: AddVariableInput) => Promise<void>;
+}) {
+  const keyInputRef = useRef<HTMLInputElement>(null);
   const [open, setOpen] = useState(false);
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
@@ -25,18 +29,17 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
     setLoading(true);
 
     try {
-      await createVariable({
+      await onAdd({
         key: key.toUpperCase(),
         value,
         description,
-        environmentId,
       });
+      // Keep the form open and clear the fields so several variables can be
+      // added back-to-back; each appears instantly via the optimistic list.
       setKey("");
       setValue("");
       setDescription("");
-      setOpen(false);
-      toast.success("Variable created");
-      router.refresh();
+      keyInputRef.current?.focus();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create variable"
@@ -72,6 +75,7 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
           </Label>
           <Input
             id="var-key"
+            ref={keyInputRef}
             type="text"
             required
             value={key}
@@ -123,7 +127,7 @@ export function AddVariableForm({ environmentId }: { environmentId: string }) {
           size="sm"
           onClick={() => setOpen(false)}
         >
-          Cancel
+          Done
         </Button>
         <Button type="submit" size="sm" disabled={loading}>
           {loading && <Loader2 className="size-4 animate-spin" />}

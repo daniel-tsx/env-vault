@@ -1,12 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { revealVariable, deleteVariable } from "@/features/variables/actions";
+import { revealVariable } from "@/features/variables/actions";
 import { EditVariableDialog } from "@/features/variables/edit-variable-dialog";
 import { VariableHistoryDialog } from "@/features/variables/variable-history-dialog";
 import { StepUpDialog } from "@/features/auth/step-up-dialog";
 import { Eye, EyeOff, Copy, Trash2, Loader2, Check } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -26,15 +25,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
-import type { InferSelectModel } from "drizzle-orm";
-import type { environmentVariables } from "@/db/schema";
+import type { UpdateVariableInput } from "@/lib/validators/variable";
 
-type Variable = Pick<
-  InferSelectModel<typeof environmentVariables>,
-  "id" | "key" | "description" | "createdAt" | "updatedAt"
->;
+export type VariableView = {
+  id: string;
+  key: string;
+  description: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+  environmentId: string;
+  pending?: boolean;
+};
 
-export function VariableList({ variables }: { variables: Variable[] }) {
+type VariableHandlers = {
+  onDelete: (id: string) => void;
+  onUpdate: (id: string, input: UpdateVariableInput) => Promise<void>;
+};
+
+export function VariableList({
+  variables,
+  onDelete,
+  onUpdate,
+}: { variables: VariableView[] } & VariableHandlers) {
   if (variables.length === 0) {
     return (
       <p className="text-sm text-muted-foreground mb-4">
@@ -46,23 +58,34 @@ export function VariableList({ variables }: { variables: Variable[] }) {
   return (
     <div className="space-y-3 mb-4">
       {variables.map((variable) => (
-        <VariableItem key={variable.id} variable={variable} />
+        <VariableItem
+          key={variable.id}
+          variable={variable}
+          onDelete={onDelete}
+          onUpdate={onUpdate}
+        />
       ))}
     </div>
   );
 }
 
-function VariableItem({ variable }: { variable: Variable }) {
-  const router = useRouter();
+function VariableItem({
+  variable,
+  onDelete,
+  onUpdate,
+}: { variable: VariableView } & VariableHandlers) {
   const [revealed, setRevealed] = useState(false);
   const [value, setValue] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [deleting, setDeleting] = useState(false);
   const [stepUpOpen, setStepUpOpen] = useState(false);
   const [pendingAction, setPendingAction] = useState<"reveal" | "copy" | null>(
     null
   );
+
+  // A row that hasn't been persisted yet has no real id, so its value-bound
+  // actions (reveal/copy/edit/history/delete) are disabled until it reconciles.
+  const pending = variable.pending ?? false;
 
   function showValue(next: string) {
     setValue(next);
@@ -148,20 +171,14 @@ function VariableItem({ variable }: { variable: Variable }) {
     else if (action === "copy") handleCopy();
   }
 
-  async function handleDelete() {
-    setDeleting(true);
-    try {
-      await deleteVariable(variable.id);
-      toast.success("Variable deleted");
-      router.refresh();
-    } catch {
-      toast.error("Failed to delete variable");
-      setDeleting(false);
-    }
-  }
-
   return (
-    <div className="flex items-center gap-4 p-4 border border-border/50 rounded-lg bg-card hover:border-primary/30 transition-all duration-200 group">
+    <div
+      className={`flex items-center gap-4 p-4 border border-border/50 rounded-lg bg-card transition-all duration-200 group ${
+        pending
+          ? "opacity-60 animate-pulse pointer-events-none"
+          : "hover:border-primary/30"
+      }`}
+    >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 mb-1">
           <code className="text-sm font-mono font-semibold text-foreground">
@@ -194,7 +211,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 variant="ghost"
                 size="icon"
                 onClick={handleReveal}
-                disabled={loading}
+                disabled={loading || pending}
                 className="size-9"
               />
             }
@@ -217,7 +234,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                 variant="ghost"
                 size="icon"
                 onClick={handleCopy}
-                disabled={loading}
+                disabled={loading || pending}
                 className="size-9"
               />
             }
@@ -231,9 +248,9 @@ function VariableItem({ variable }: { variable: Variable }) {
           <TooltipContent>Copy value</TooltipContent>
         </Tooltip>
 
-        <EditVariableDialog variable={variable} />
+        <EditVariableDialog variable={variable} onSubmit={onUpdate} disabled={pending} />
 
-        <VariableHistoryDialog variableId={variable.id} />
+        <VariableHistoryDialog variableId={variable.id} disabled={pending} />
 
         <AlertDialog>
           <Tooltip>
@@ -244,6 +261,7 @@ function VariableItem({ variable }: { variable: Variable }) {
                     <Button
                       variant="ghost"
                       size="icon"
+                      disabled={pending}
                       className="size-9 text-muted-foreground hover:text-destructive"
                     />
                   }
@@ -265,11 +283,9 @@ function VariableItem({ variable }: { variable: Variable }) {
             <AlertDialogFooter>
               <AlertDialogCancel>Cancel</AlertDialogCancel>
               <AlertDialogAction
-                onClick={handleDelete}
-                disabled={deleting}
+                onClick={() => onDelete(variable.id)}
                 className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               >
-                {deleting && <Loader2 className="size-4 animate-spin" />}
                 Delete
               </AlertDialogAction>
             </AlertDialogFooter>

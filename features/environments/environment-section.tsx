@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { deleteEnvironment } from "@/features/environments/actions";
-import { VariableList } from "@/features/variables/variable-list";
+import { VariableList, type VariableView } from "@/features/variables/variable-list";
 import { AddVariableForm } from "@/features/variables/add-variable-form";
 import { ImportEnvDialog } from "@/features/variables/import-env-dialog";
 import { ExportEnvButton } from "@/features/variables/export-env-button";
 import { EditEnvironmentDialog } from "@/features/environments/edit-environment-dialog";
-import { Trash2, Loader2, ChevronDown, ChevronRight, Server } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { Trash2, ChevronDown, ChevronRight, Server } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -24,37 +22,42 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import type { InferSelectModel } from "drizzle-orm";
-import type { environments, environmentVariables } from "@/db/schema";
+import type { environments } from "@/db/schema";
+import type { CreateVariableInput, UpdateVariableInput } from "@/lib/validators/variable";
+import type { UpdateEnvironmentInput } from "@/lib/validators/environment";
 
-type Environment = InferSelectModel<typeof environments>;
-type Variable = Pick<
-  InferSelectModel<typeof environmentVariables>,
-  "id" | "key" | "description" | "createdAt" | "updatedAt"
->;
+export type EnvironmentView = InferSelectModel<typeof environments> & {
+  pending?: boolean;
+};
+
+type AddVariableInput = Omit<CreateVariableInput, "environmentId">;
 
 export function EnvironmentSection({
   environment,
   variables,
+  onRenameEnvironment,
+  onDeleteEnvironment,
+  onAddVariable,
+  onDeleteVariable,
+  onUpdateVariable,
 }: {
-  environment: Environment;
-  variables: Variable[];
+  environment: EnvironmentView;
+  variables: VariableView[];
+  onRenameEnvironment: (input: UpdateEnvironmentInput) => Promise<void>;
+  onDeleteEnvironment: () => void;
+  onAddVariable: (input: AddVariableInput) => Promise<void>;
+  onDeleteVariable: (id: string) => void;
+  onUpdateVariable: (id: string, input: UpdateVariableInput) => Promise<void>;
 }) {
-  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-
-  async function handleDelete() {
-    setDeleting(true);
-    try {
-      await deleteEnvironment(environment.id);
-      router.refresh();
-    } catch {
-      setDeleting(false);
-    }
-  }
+  const pending = environment.pending ?? false;
 
   return (
-    <Card className="overflow-hidden rounded-2xl border-border/60">
+    <Card
+      className={`overflow-hidden rounded-2xl border-border/60 ${
+        pending ? "opacity-60 animate-pulse pointer-events-none" : ""
+      }`}
+    >
       <CardHeader className="pb-4 bg-muted/30 border-b border-border/60">
         <div className="flex items-center justify-between">
           <button
@@ -75,50 +78,55 @@ export function EnvironmentSection({
             </Badge>
           </button>
           <div className="flex items-center gap-1">
-          <EditEnvironmentDialog environment={environment} />
-          <AlertDialog>
-            <AlertDialogTrigger
-              render={
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-muted-foreground hover:text-destructive"
-                />
-              }
-            >
-              <Trash2 className="size-4" />
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Delete environment</AlertDialogTitle>
-                <AlertDialogDescription>
-                  This will permanently delete the{" "}
-                  <strong>{environment.name}</strong> environment and all its
-                  variables. This action cannot be undone.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={handleDelete}
-                  disabled={deleting}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  {deleting && <Loader2 className="size-4 animate-spin" />}
-                  Delete
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+            <EditEnvironmentDialog
+              environment={environment}
+              onRename={onRenameEnvironment}
+            />
+            <AlertDialog>
+              <AlertDialogTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="text-muted-foreground hover:text-destructive"
+                  />
+                }
+              >
+                <Trash2 className="size-4" />
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete environment</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete the{" "}
+                    <strong>{environment.name}</strong> environment and all its
+                    variables. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={onDeleteEnvironment}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    Delete
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </div>
         </div>
       </CardHeader>
 
       {!collapsed && (
         <CardContent className="pt-6">
-          <VariableList variables={variables} />
+          <VariableList
+            variables={variables}
+            onDelete={onDeleteVariable}
+            onUpdate={onUpdateVariable}
+          />
           <div className="mt-6 pt-6 border-t border-border/60 space-y-3">
-            <AddVariableForm environmentId={environment.id} />
+            <AddVariableForm onAdd={onAddVariable} />
             <div className="flex flex-wrap gap-2">
               <ImportEnvDialog environmentId={environment.id} />
               <ExportEnvButton environmentId={environment.id} />

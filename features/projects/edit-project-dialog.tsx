@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateProject } from "@/features/projects/actions";
 import { Pencil, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -24,13 +22,15 @@ import {
 } from "@/components/ui/tooltip";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
+import type { UpdateProjectInput } from "@/lib/validators/project";
 
 export function EditProjectDialog({
   project,
+  onSubmit,
 }: {
   project: { id: string; name: string; description: string | null };
+  onSubmit: (input: UpdateProjectInput) => Promise<void>;
 }) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description ?? "");
@@ -48,10 +48,9 @@ export function EditProjectDialog({
     setError("");
     setLoading(true);
     try {
-      await updateProject(project.id, { name, description });
+      await onSubmit({ name, description });
       setOpen(false);
       toast.success("Project updated");
-      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update project");
     } finally {

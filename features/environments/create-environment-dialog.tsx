@@ -1,9 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createEnvironment } from "@/features/environments/actions";
 import { Plus, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,9 +15,13 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import type { CreateEnvironmentInput } from "@/lib/validators/environment";
 
-export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
-  const router = useRouter();
+export function CreateEnvironmentDialog({
+  onCreate,
+}: {
+  onCreate: (input: CreateEnvironmentInput) => Promise<void>;
+}) {
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [error, setError] = useState("");
@@ -31,10 +33,9 @@ export function CreateEnvironmentDialog({ projectId }: { projectId: string }) {
     setLoading(true);
 
     try {
-      await createEnvironment(projectId, { name });
+      await onCreate({ name });
       setOpen(false);
       setName("");
-      router.refresh();
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to create environment"
