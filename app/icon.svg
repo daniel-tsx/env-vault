@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EnvVault">
+  <rect width="64" height="64" rx="15" fill="#1E80E6"/>
+  <g fill="none" stroke="#ffffff" stroke-width="6.4" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M25 14 H17 Q15 14 15 16 V48 Q15 50 17 50 H25"/>
+    <path d="M39 14 H47 Q49 14 49 16 V48 Q49 50 47 50 H39"/>
+  </g><path d="M32 23.5 L40 31.5 L32 39.5 L24 31.5 Z" fill="#ffffff"/>
+</svg>

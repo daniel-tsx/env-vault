@@ -25,6 +25,9 @@
   --radius: 0.75rem;
   --background: oklch(0.995 0.001 260);
   --foreground: oklch(0.16 0.01 260);
+  /* Brand mark color — fixed across themes so the logo is theme-independent
+     (matches the exported favicon / app icons). Aligns with --primary's azure. */
+  --ev-brand: #1e80e6;
   --chart-1: oklch(0.65 0.18 220);
   --chart-2: oklch(0.7 0.16 220);
   --chart-3: oklch(0.75 0.14 220);
@@ -190,6 +193,65 @@ body {
 }
 @media (prefers-reduced-motion: reduce) {
   .ev-reveal {
+    animation: none;
+  }
+}
+
+/* Animated logo — one-shot "vault clamp" on load: the brackets ease inward to
+   seal the diamond, which settles in last. Calm, single-run, no looping. Used
+   only in high-visibility brand spots (header). Degrades to the static mark. */
+@keyframes ev-logo-clamp-l {
+  0% {
+    transform: translateX(-3.5px);
+    opacity: 0.55;
+  }
+  70% {
+    transform: translateX(0.7px);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ev-logo-clamp-r {
+  0% {
+    transform: translateX(3.5px);
+    opacity: 0.55;
+  }
+  70% {
+    transform: translateX(-0.7px);
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+@keyframes ev-logo-core {
+  0%,
+  55% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.ev-logo-animated .ev-logo-l {
+  animation: ev-logo-clamp-l 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ev-logo-animated .ev-logo-r {
+  animation: ev-logo-clamp-r 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.ev-logo-animated .ev-logo-core {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: ev-logo-core 0.52s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ev-logo-animated .ev-logo-l,
+  .ev-logo-animated .ev-logo-r,
+  .ev-logo-animated .ev-logo-core {
     animation: none;
   }
 }

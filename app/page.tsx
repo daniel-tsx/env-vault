@@ -13,6 +13,7 @@ import {
   RotateCcw,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
+import { AnimatedLogo } from "@/components/animated-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DotGrid } from "@/components/dot-grid";
 
@@ -35,7 +36,7 @@ function SiteHeader() {
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         <div className="flex items-center gap-2.5">
-          <Logo className="size-9" />
+          <AnimatedLogo className="size-9" />
           <span className="text-xl font-bold tracking-tight">EnvVault</span>
         </div>
         <nav className="flex items-center gap-2">

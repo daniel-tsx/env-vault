@@ -1,30 +1,48 @@
-// Brand mark — kept in sync with logo.svg / app/favicon.ico (Env "{ }" braces
-// around a Vault keyhole). Fixed brand colors so it matches the favicon exactly
-// in both light and dark. Size it with a className (e.g. "size-9").
-export function Logo({ className }: { className?: string }) {
+// EnvVault brand mark — "Bracket Vault": engineered config brackets [ ] sealing
+// a diamond (the encrypted secret value). Kept in exact sync with the exported
+// assets (app/icon.svg, app/favicon.ico, public/brand/*). Brand color comes from
+// the --ev-brand token so it stays theme-independent and matches the favicon.
+// Size it with a className (e.g. "size-9").
+
+// Shared geometry (viewBox 0 0 64 64) — single source of truth for the static
+// and animated marks so they can never drift apart.
+export const MARK_BRACKET_L =
+  "M25 14 H17.2 Q15 14 15 16.2 V47.8 Q15 50 17.2 50 H25";
+export const MARK_BRACKET_R =
+  "M39 14 H46.8 Q49 14 49 16.2 V47.8 Q49 50 46.8 50 H39";
+export const MARK_CORE = "M32 24.4 L39.1 31.5 L32 38.6 L24.9 31.5 Z";
+export const MARK_STROKE = 6;
+
+export function Logo({
+  className,
+  color = "var(--ev-brand)",
+}: {
+  className?: string;
+  color?: string;
+}) {
   return (
     <svg
-      viewBox="0 0 512 512"
+      viewBox="0 0 64 64"
       className={className}
       role="img"
       aria-label="EnvVault logo"
       xmlns="http://www.w3.org/2000/svg"
     >
-      <rect width="512" height="512" rx="116" fill="#0D6FD1" />
       <g
         fill="none"
-        stroke="#ffffff"
-        strokeWidth="34"
+        stroke={color}
+        strokeWidth={MARK_STROKE}
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        <path d="M170 170 Q140 170 140 200 L140 238 Q140 256 118 256 Q140 256 140 274 L140 312 Q140 342 170 342" />
-        <path d="M342 170 Q372 170 372 200 L372 238 Q372 256 394 256 Q372 256 372 274 L372 312 Q372 342 342 342" />
+        <path d={MARK_BRACKET_L} />
+        <path d={MARK_BRACKET_R} />
       </g>
-      <g fill="#ffffff">
-        <circle cx="256" cy="226" r="42" />
-        <path d="M243 256 L269 256 L286 332 Q288 340 279 340 L233 340 Q226 340 226 332 Z" />
-      </g>
+      <path d={MARK_CORE} fill={color} />
     </svg>
   );
 }
+
+// The symbol is the same as the primary mark — exported under both names so
+// imports read clearly at the call site.
+export { Logo as LogoMark };

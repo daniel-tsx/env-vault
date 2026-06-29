@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" class="ev" role="img" aria-label="EnvVault">
+  <style>
+    .ev .l{animation:evl .42s cubic-bezier(.22,1,.36,1) both}
+    .ev .r{animation:evr .42s cubic-bezier(.22,1,.36,1) both}
+    .ev .c{transform-box:fill-box;transform-origin:center;animation:evc .52s cubic-bezier(.22,1,.36,1) both}
+    @keyframes evl{0%{transform:translateX(-3.5px);opacity:.55}70%{transform:translateX(.7px)}100%{transform:translateX(0);opacity:1}}
+    @keyframes evr{0%{transform:translateX(3.5px);opacity:.55}70%{transform:translateX(-.7px)}100%{transform:translateX(0);opacity:1}}
+    @keyframes evc{0%,55%{opacity:0;transform:scale(.5)}100%{opacity:1;transform:scale(1)}}
+    @media (prefers-reduced-motion:reduce){.ev .l,.ev .r,.ev .c{animation:none}}
+  </style>
+  <g fill="none" stroke="#1E80E6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+    <path class="l" d="M25 14 H17.2 Q15 14 15 16.2 V47.8 Q15 50 17.2 50 H25"/>
+    <path class="r" d="M39 14 H46.8 Q49 14 49 16.2 V47.8 Q49 50 46.8 50 H39"/>
+  </g>
+  <path class="c" d="M32 24.4 L39.1 31.5 L32 38.6 L24.9 31.5 Z" fill="#1E80E6"/>
+</svg>

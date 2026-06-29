@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="EnvVault">
-  <g fill="none" stroke="#1E80E6" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
+  <g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round">
     <path d="M25 14 H17.2 Q15 14 15 16.2 V47.8 Q15 50 17.2 50 H25"/>
     <path d="M39 14 H46.8 Q49 14 49 16.2 V47.8 Q49 50 46.8 50 H39"/>
-  </g><path d="M32 24.4 L39.1 31.5 L32 38.6 L24.9 31.5 Z" fill="#1E80E6"/>
+  </g><path d="M32 24.4 L39.1 31.5 L32 38.6 L24.9 31.5 Z" fill="currentColor"/>
 </svg>
